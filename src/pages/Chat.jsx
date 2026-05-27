@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { MessageCircle, Send, Plus, Users, Hash, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -41,12 +42,27 @@ export default function Chat() {
   }, [messages]);
 
   const sendMessage = useMutation({
-    mutationFn: () => base44.entities.ChatMessage.create({
-      room_id: selectedRoom.id,
-      sender_email: user?.email,
-      sender_name: user?.full_name || user?.email,
-      content: message,
-    }),
+    mutationFn: async () => {
+      const msg = await base44.entities.ChatMessage.create({
+        room_id: selectedRoom.id,
+        sender_email: user?.email,
+        sender_name: user?.full_name || user?.email,
+        content: message,
+      });
+      // Update last message on room
+      await base44.entities.ChatRoom.update(selectedRoom.id, { last_message: message });
+      // Notify other members
+      const others = (selectedRoom.members || []).filter(m => m !== user?.email);
+      for (const memberEmail of others) {
+        await base44.entities.Notification.create({
+          user_email: memberEmail, type: 'message',
+          title: `${user?.full_name || user?.email?.split('@')[0]} ส่งข้อความ`,
+          message: message.length > 50 ? message.slice(0, 50) + '...' : message,
+          from_user: user?.email, link: '/chat',
+        });
+      }
+      return msg;
+    },
     onSuccess: () => {
       setMessage('');
       refetchMessages();
@@ -147,7 +163,11 @@ export default function Chat() {
                   return (
                     <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${isMe ? 'bg-primary text-primary-foreground' : 'glass'}`}>
-                        {!isMe && <p className="text-xs font-medium text-primary mb-1">{msg.sender_name}</p>}
+                        {!isMe && (
+                          <Link to={`/user/${encodeURIComponent(msg.sender_email)}`} className="text-xs font-medium text-primary mb-1 hover:underline block">
+                            {msg.sender_name}
+                          </Link>
+                        )}
                         <p className="text-sm">{msg.content}</p>
                       </div>
                     </div>
