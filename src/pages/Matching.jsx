@@ -9,7 +9,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import GlassCard from '@/components/ui/GlassCard';
-import MatchChatPopup from '@/components/matching/MatchChatPopup';
+
 
 const HEARTBEAT_INTERVAL = 15000;
 const ACTIVE_THRESHOLD = 60000;
@@ -22,8 +22,7 @@ export default function Matching() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [searching, setSearching] = useState(false);
   const [mySession, setMySession] = useState(null);
-  const [likedEmails, setLikedEmails] = useState(new Set());   // emails I liked
-  const [chatPopup, setChatPopup] = useState(null);             // { buddyEmail, match, bookTitle }
+  const [likedEmails, setLikedEmails] = useState(new Set());
 
   const heartbeatRef = useRef(null);
 
@@ -69,49 +68,50 @@ export default function Matching() {
   });
 
   // Poll for mutual likes (someone liked me back)
-  useQuery({
-    queryKey: ['mutual-likes', user?.email],
-    queryFn: async () => {
-      if (!likedEmails.size) return [];
-      // Check if anyone who I liked has also liked me
+  useEffect(() => {
+    if (!likedEmails.size || !user?.email) return;
+
+    const checkMutualLikes = async () => {
       for (const likedEmail of likedEmails) {
+        // Check if buddy also liked me
         const theyLikedMe = await base44.entities.ReaderMatch.filter({
           user_email: likedEmail,
-          matched_email: user?.email,
+          matched_email: user.email,
           status: 'liked',
         });
-        if (theyLikedMe.length > 0) {
-          // Mutual like! update both to accepted and open chat
-          const myMatch = await base44.entities.ReaderMatch.filter({
-            user_email: user?.email,
-            matched_email: likedEmail,
-          });
-          if (myMatch.length > 0 && myMatch[0].status === 'liked') {
-            await base44.entities.ReaderMatch.update(myMatch[0].id, { status: 'accepted' });
-            await base44.entities.ReaderMatch.update(theyLikedMe[0].id, { status: 'accepted' });
-            // Notify the other person
-            await base44.entities.Notification.create({
-              user_email: likedEmail,
-              type: 'match',
-              title: '💕 แมทช์แล้ว!',
-              message: `${user?.full_name || user?.email?.split('@')[0]} กดใจคุณกลับแล้ว!`,
-              from_user: user?.email,
-              link: '/matching',
-            });
-            setChatPopup({
-              buddyEmail: likedEmail,
-              match: myMatch[0],
-              bookTitle: selectedBook?.title,
-            });
-            setLikedEmails(prev => { const n = new Set(prev); n.delete(likedEmail); return n; });
-          }
-        }
+        if (theyLikedMe.length === 0) continue;
+
+        // Get my match record
+        const myMatches = await base44.entities.ReaderMatch.filter({
+          user_email: user.email,
+          matched_email: likedEmail,
+        });
+        if (myMatches.length === 0 || myMatches[0].status !== 'liked') continue;
+
+        // Mutual! Update both to accepted
+        const myMatch = myMatches[0];
+        await base44.entities.ReaderMatch.update(myMatch.id, { status: 'accepted' });
+        await base44.entities.ReaderMatch.update(theyLikedMe[0].id, { status: 'accepted' });
+
+        // Notify the buddy
+        await base44.entities.Notification.create({
+          user_email: likedEmail,
+          type: 'match',
+          title: '💕 แมทช์แล้ว!',
+          message: `${user.full_name || user.email.split('@')[0]} กดใจคุณกลับแล้ว!`,
+          from_user: user.email,
+          link: '/matching',
+        });
+
+        // Remove from pending — GlobalMatchWatcher will open popup
+        setLikedEmails(prev => { const n = new Set(prev); n.delete(likedEmail); return n; });
+        break;
       }
-      return [];
-    },
-    enabled: likedEmails.size > 0,
-    refetchInterval: 4000,
-  });
+    };
+
+    const interval = setInterval(checkMutualLikes, 4000);
+    return () => clearInterval(interval);
+  }, [likedEmails, user?.email, selectedBook?.title]);
 
   const startSearching = useCallback(async (book) => {
     if (!user || !book) return;
@@ -195,18 +195,6 @@ export default function Matching() {
 
   return (
     <div className="min-h-screen px-4 py-8">
-      {/* Chat Popup */}
-      <AnimatePresence>
-        {chatPopup && (
-          <MatchChatPopup
-            match={chatPopup.match}
-            buddyEmail={chatPopup.buddyEmail}
-            bookTitle={chatPopup.bookTitle}
-            onClose={() => setChatPopup(null)}
-          />
-        )}
-      </AnimatePresence>
-
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
