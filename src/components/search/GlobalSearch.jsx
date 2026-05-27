@@ -166,17 +166,19 @@ export default function GlobalSearch({ open, onClose }) {
                     <User className="w-3 h-3" /> ผู้ใช้
                   </div>
                   {results.users.map(u => (
-                    <div key={u.id} className="flex items-center gap-3 px-4 py-3 hover:bg-primary/5 transition-colors">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
-                        <span className="text-white text-xs font-bold">
-                          {u.full_name?.charAt(0)?.toUpperCase() || '?'}
-                        </span>
+                    <Link key={u.id} to={`/user/${encodeURIComponent(u.email)}`} onClick={handleSelect}>
+                      <div className="flex items-center gap-3 px-4 py-3 hover:bg-primary/5 transition-colors cursor-pointer">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
+                          <span className="text-white text-xs font-bold">
+                            {u.full_name?.charAt(0)?.toUpperCase() || '?'}
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{u.full_name}</p>
+                          <p className="text-xs text-muted-foreground truncate">@{u.email?.split('@')[0]}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{u.full_name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{u.email}</p>
-                      </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}
