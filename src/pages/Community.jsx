@@ -120,7 +120,7 @@ function PostList({ posts, loading, likePost, typeColors }) {
               <div className="flex items-center gap-2">
                 <Badge className={`${typeColors[post.post_type] || typeColors.discussion} text-xs`}>{post.post_type}</Badge>
               </div>
-              <span className="text-xs text-muted-foreground">{post.created_by}</span>
+              <span className="text-xs text-muted-foreground">@{post.created_by?.split('@')[0]}</span>
             </div>
             <h3 className="font-bold mb-2">{post.title}</h3>
             <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{post.content}</p>

@@ -1,0 +1,25 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "description": "The role of the user in the app",
+      "enum": [
+        "admin",
+        "user"
+      ]
+    },
+    "username": {
+      "type": "string",
+      "description": "Unique username e.g. bookworm123"
+    },
+    "bio": {
+      "type": "string",
+      "description": "User bio"
+    }
+  },
+  "required": [
+    "role"
+  ]
+}

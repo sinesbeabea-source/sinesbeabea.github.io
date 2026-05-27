@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet, Coins } from 'lucide-react';
+import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet, Coins, AtSign } from 'lucide-react';
+import UsernameSetup from '@/components/profile/UsernameSetup';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import GlassCard from '@/components/ui/GlassCard';
@@ -19,6 +20,7 @@ export default function Profile() {
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
+  const [showUsernameSetup, setShowUsernameSetup] = useState(!user?.username);
 
   const { data: myBooks, refetch: refetchBooks } = useQuery({
     queryKey: ['my-books'],
@@ -75,7 +77,14 @@ export default function Profile() {
             </div>
 
             <h1 className="text-2xl font-space font-bold mb-1">{user?.full_name || 'นักอ่าน'}</h1>
-            <p className="text-sm text-muted-foreground mb-4">{user?.email}</p>
+            {user?.username ? (
+              <p className="text-sm text-primary font-medium mb-1">@{user.username}</p>
+            ) : (
+              <button onClick={() => setShowUsernameSetup(true)} className="text-xs text-accent underline mb-1 flex items-center gap-1 mx-auto">
+                <AtSign className="w-3 h-3" /> ตั้ง username
+              </button>
+            )}
+            <p className="text-xs text-muted-foreground mb-4">{user?.email}</p>
 
             <div className="flex flex-wrap justify-center gap-2 mb-6">
               <Badge className="bg-primary/10 text-primary">คนรักหนังสือ</Badge>
@@ -175,6 +184,11 @@ export default function Profile() {
           </Button>
         </div>
       </div>
+
+      {/* Username Setup */}
+      {showUsernameSetup && (
+        <UsernameSetup onDone={() => { setShowUsernameSetup(false); window.location.reload(); }} />
+      )}
 
       {/* Avatar Editor Dialog */}
       <Dialog open={showAvatarEditor} onOpenChange={setShowAvatarEditor}>

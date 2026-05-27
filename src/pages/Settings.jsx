@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, User, Bell, Shield, Palette, LogOut, Save, Loader2 } from 'lucide-react';
+import { Settings as SettingsIcon, User, Bell, Shield, LogOut, Save, Loader2, AtSign, CheckCircle2, XCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,12 +15,23 @@ import GlassCard from '@/components/ui/GlassCard';
 export default function Settings() {
   const { user } = useAuth();
   const [bio, setBio] = useState(user?.bio || '');
+  const [username, setUsername] = useState(user?.username || '');
   const [saving, setSaving] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
+
+  const isValidUsername = /^[a-z0-9_]{3,20}$/.test(username);
 
   const handleSave = async () => {
+    if (username && username !== user?.username) {
+      if (!isValidUsername) { setUsernameError('ใช้ตัวอักษรเล็ก, ตัวเลข หรือ _ (3-20 ตัว)'); return; }
+      const all = await base44.entities.User.list();
+      const taken = all.some(u => u.username === username && u.id !== user?.id);
+      if (taken) { setUsernameError('username นี้ถูกใช้แล้ว'); return; }
+    }
     setSaving(true);
-    await base44.auth.updateMe({ bio });
+    await base44.auth.updateMe({ bio, username: username || undefined });
     setSaving(false);
+    setUsernameError('');
   };
 
   return (
@@ -48,6 +60,26 @@ export default function Settings() {
                 <div>
                   <Label className="text-sm font-medium mb-2 block">ชื่อ</Label>
                   <Input value={user?.full_name || ''} disabled className="bg-muted" />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium mb-2 block">Username</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">@</span>
+                    <Input
+                      value={username}
+                      onChange={e => { setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')); setUsernameError(''); }}
+                      placeholder="bookworm123"
+                      className="pl-7"
+                      maxLength={20}
+                    />
+                    {username.length >= 3 && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                        {isValidUsername ? <CheckCircle2 className="w-4 h-4 text-green-400" /> : <XCircle className="w-4 h-4 text-destructive" />}
+                      </span>
+                    )}
+                  </div>
+                  {usernameError && <p className="text-xs text-destructive mt-1">{usernameError}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">ตัวอักษรเล็ก, ตัวเลข, _ เท่านั้น (3-20 ตัว)</p>
                 </div>
                 <div>
                   <Label className="text-sm font-medium mb-2 block">แนะนำตัว</Label>
