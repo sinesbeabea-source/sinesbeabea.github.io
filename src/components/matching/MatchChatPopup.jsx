@@ -3,13 +3,16 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, X, Heart, UserPlus, UserCheck, ArrowRight } from 'lucide-react';
+import {
+  Send, X, Heart, UserPlus, UserCheck, ArrowRight,
+  Phone, PhoneOff, PhoneIncoming, BookOpen, ChevronRight
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-// After-chat popup
+// ─── After Chat Popup ───────────────────────────────────────────────
 function AfterChatPopup({ matchedEmail, onClose }) {
   const { user } = useAuth();
   const [followed, setFollowed] = useState(false);
@@ -35,9 +38,7 @@ function AfterChatPopup({ matchedEmail, onClose }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[90] bg-background/60 backdrop-blur-md flex items-center justify-center px-4"
     >
       <motion.div
@@ -49,17 +50,14 @@ function AfterChatPopup({ matchedEmail, onClose }) {
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl font-bold text-white">{matchedEmail?.[0]?.toUpperCase()}</span>
         </div>
-        <h3 className="font-space font-bold text-lg mb-1">จบการสนทนาแล้ว</h3>
+        <h3 className="font-space font-bold text-lg mb-1">จบการสนทนาแล้ว 💬</h3>
         <p className="text-sm text-muted-foreground mb-5">
           สนใจติดตาม <span className="text-foreground font-medium">{matchedEmail?.split('@')[0]}</span> ต่อมั้ย?
         </p>
         <div className="flex flex-col gap-2">
           {!followed ? (
-            <Button
-              onClick={handleFollow}
-              disabled={loading}
-              className="gap-2 bg-gradient-to-r from-primary to-accent w-full rounded-full"
-            >
+            <Button onClick={handleFollow} disabled={loading}
+              className="gap-2 bg-gradient-to-r from-primary to-accent w-full rounded-full">
               <UserPlus className="w-4 h-4" />
               {loading ? 'กำลังติดตาม...' : 'ติดตามเลย'}
             </Button>
@@ -83,17 +81,210 @@ function AfterChatPopup({ matchedEmail, onClose }) {
   );
 }
 
-// Main chat popup — accepts matchId (string) or buddyEmail directly
+// ─── Read Together Panel ─────────────────────────────────────────────
+function ReadTogetherPanel({ matchId, buddyEmail, onClose }) {
+  const navigate = useNavigate();
+  const [books, setBooks] = useState([]);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    base44.entities.Book.filter({ status: 'published' }, '-read_count', 30).then(setBooks);
+  }, []);
+
+  const selectBook = async (book) => {
+    setSelectedBook(book);
+    setLoading(true);
+    const chs = await base44.entities.Chapter.filter({ book_id: book.id, status: 'published' }, 'chapter_number', 50);
+    setChapters(chs);
+    setLoading(false);
+  };
+
+  const startReading = async (chapter) => {
+    // Sync read state on match record
+    await base44.entities.ReaderMatch.update(matchId, {
+      sync_book_id: selectedBook.id,
+      sync_book_title: selectedBook.title,
+      sync_chapter_id: chapter.id,
+      sync_chapter_number: chapter.chapter_number,
+      sync_chapter_title: chapter.title,
+      sync_active: true,
+    });
+    // Notify buddy
+    await base44.entities.Notification.create({
+      user_email: buddyEmail,
+      type: 'system',
+      title: '📖 เริ่มอ่านด้วยกัน!',
+      message: `กำลังอ่าน "${selectedBook.title}" บทที่ ${chapter.chapter_number}`,
+      link: `/read/${selectedBook.id}/${chapter.id}`,
+    });
+    navigate(`/read/${selectedBook.id}/${chapter.id}`);
+    onClose();
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: '100%' }} animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: '100%' }}
+      className="absolute inset-0 bg-card rounded-t-3xl sm:rounded-2xl flex flex-col overflow-hidden z-10"
+    >
+      <div className="flex items-center gap-3 p-4 border-b border-border/30">
+        <Button size="icon" variant="ghost" onClick={onClose} className="h-7 w-7">
+          <X className="w-4 h-4" />
+        </Button>
+        <span className="font-semibold text-sm">
+          {selectedBook ? `📖 ${selectedBook.title}` : '📚 เลือกหนังสืออ่านด้วยกัน'}
+        </span>
+        {selectedBook && (
+          <Button size="sm" variant="ghost" className="ml-auto text-xs text-muted-foreground"
+            onClick={() => { setSelectedBook(null); setChapters([]); }}>
+            เปลี่ยน
+          </Button>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        {!selectedBook ? (
+          books.map(book => (
+            <button key={book.id} onClick={() => selectBook(book)}
+              className="w-full flex items-center gap-3 p-3 rounded-xl glass glass-hover text-left">
+              {book.cover_url
+                ? <img src={book.cover_url} className="w-10 h-14 object-cover rounded-lg shrink-0" alt="" />
+                : <div className="w-10 h-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-primary" />
+                  </div>
+              }
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{book.title}</p>
+                <p className="text-xs text-muted-foreground truncate">{book.author}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </button>
+          ))
+        ) : loading ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">กำลังโหลดบท...</div>
+        ) : chapters.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">ไม่มีบทที่เผยแพร่แล้ว</div>
+        ) : (
+          chapters.map(ch => (
+            <button key={ch.id} onClick={() => startReading(ch)}
+              className="w-full flex items-center gap-3 p-3 rounded-xl glass glass-hover text-left">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-xs font-bold text-primary">
+                {ch.chapter_number}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{ch.title}</p>
+                <p className="text-xs text-muted-foreground">{ch.word_count ? `${ch.word_count.toLocaleString()} คำ` : ''}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </button>
+          ))
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Call Overlay ────────────────────────────────────────────────────
+function CallOverlay({ matchId, buddyEmail, callStatus, isIncoming, onEnd }) {
+  const { user } = useAuth();
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    if (callStatus !== 'in_call') return;
+    const t = setInterval(() => setDuration(d => d + 1), 1000);
+    return () => clearInterval(t);
+  }, [callStatus]);
+
+  const fmtDuration = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  const acceptCall = async () => {
+    await base44.entities.ReaderMatch.update(matchId, { call_status: 'in_call' });
+    // Also update buddy's record
+    const reverse = await base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email });
+    for (const r of reverse) {
+      await base44.entities.ReaderMatch.update(r.id, { call_status: 'in_call' });
+    }
+  };
+
+  const rejectCall = async () => {
+    await base44.entities.ReaderMatch.update(matchId, { call_status: 'idle', call_initiated_by: null });
+    const reverse = await base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email });
+    for (const r of reverse) {
+      await base44.entities.ReaderMatch.update(r.id, { call_status: 'idle', call_initiated_by: null });
+    }
+    onEnd();
+  };
+
+  const label = callStatus === 'in_call'
+    ? fmtDuration(duration)
+    : isIncoming ? 'โทรเข้า...' : 'กำลังโทร...';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
+      className="absolute inset-0 bg-gradient-to-b from-slate-900 to-background rounded-t-3xl sm:rounded-2xl flex flex-col items-center justify-center z-20"
+    >
+      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
+        <span className="text-3xl font-bold text-white">{buddyEmail?.[0]?.toUpperCase()}</span>
+      </div>
+      <p className="font-semibold text-lg mb-1">{buddyEmail?.split('@')[0]}</p>
+      <p className="text-sm text-muted-foreground mb-10">{label}</p>
+
+      <div className="flex items-center gap-6">
+        {isIncoming && callStatus === 'calling' && (
+          <button onClick={acceptCall}
+            className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors">
+            <Phone className="w-6 h-6 text-white" />
+          </button>
+        )}
+        <button onClick={rejectCall}
+          className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors">
+          <PhoneOff className="w-6 h-6 text-white" />
+        </button>
+      </div>
+      {callStatus === 'in_call' && (
+        <p className="text-xs text-muted-foreground mt-6 opacity-60">เสียงผ่านลำโพงอุปกรณ์ของคุณ</p>
+      )}
+    </motion.div>
+  );
+}
+
+// ─── Main Chat Popup ─────────────────────────────────────────────────
 export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState('');
   const [showAfterChat, setShowAfterChat] = useState(false);
+  const [showReadTogether, setShowReadTogether] = useState(false);
   const messagesEndRef = useRef(null);
 
   const roomName = user?.email && buddyEmail
     ? `reading:${[user.email, buddyEmail].sort().join(':')}`
     : null;
+
+  // Poll match record for call state changes
+  const { data: matchRecord } = useQuery({
+    queryKey: ['match-record', matchId, user?.email],
+    queryFn: () => base44.entities.ReaderMatch.filter({ user_email: user?.email, matched_email: buddyEmail, status: 'accepted' }),
+    enabled: !!user?.email && !!buddyEmail,
+    refetchInterval: 3000,
+    select: (data) => data?.[0] || null,
+  });
+
+  // Also poll buddy's match record to see call state from their side
+  const { data: buddyMatchRecord } = useQuery({
+    queryKey: ['buddy-match-record', buddyEmail, user?.email],
+    queryFn: () => base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email }),
+    enabled: !!buddyEmail && !!user?.email,
+    refetchInterval: 3000,
+    select: (data) => data?.[0] || null,
+  });
+
+  const callStatus = matchRecord?.call_status || 'idle';
+  const buddyCallStatus = buddyMatchRecord?.call_status || 'idle';
+  const isIncomingCall = buddyCallStatus === 'calling' && buddyMatchRecord?.call_initiated_by === buddyEmail;
+  const showCall = callStatus === 'calling' || callStatus === 'in_call' || isIncomingCall;
 
   // Get or create chat room
   const { data: chatRoom } = useQuery({
@@ -111,7 +302,6 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     enabled: !!roomName,
   });
 
-  // Messages with polling
   const { data: messages = [] } = useQuery({
     queryKey: ['popup-messages', chatRoom?.id],
     queryFn: () => base44.entities.ChatMessage.filter({ room_id: chatRoom.id }, 'created_date', 100),
@@ -136,13 +326,49 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     },
   });
 
+  const handleCall = async () => {
+    await base44.entities.ReaderMatch.update(matchId, {
+      call_status: 'calling',
+      call_initiated_by: user?.email,
+    });
+    // Update buddy's record too
+    const reverse = await base44.entities.ReaderMatch.filter({
+      user_email: buddyEmail,
+      matched_email: user?.email,
+    });
+    for (const r of reverse) {
+      await base44.entities.ReaderMatch.update(r.id, {
+        call_status: 'calling',
+        call_initiated_by: user?.email,
+      });
+    }
+    await base44.entities.Notification.create({
+      user_email: buddyEmail,
+      type: 'message',
+      title: '📞 โทรเข้า!',
+      message: `${user?.full_name || user?.email?.split('@')[0]} กำลังโทรหาคุณ`,
+      from_user: user?.email,
+    });
+    queryClient.invalidateQueries({ queryKey: ['match-record', matchId] });
+  };
+
+  const handleEndCall = async () => {
+    await base44.entities.ReaderMatch.update(matchId, { call_status: 'idle', call_initiated_by: null });
+    const reverse = await base44.entities.ReaderMatch.filter({
+      user_email: buddyEmail,
+      matched_email: user?.email,
+    });
+    for (const r of reverse) {
+      await base44.entities.ReaderMatch.update(r.id, { call_status: 'idle', call_initiated_by: null });
+    }
+    queryClient.invalidateQueries({ queryKey: ['match-record', matchId] });
+  };
+
   const handleEndChat = async () => {
     const now = new Date().toISOString();
-    // End my match record
     if (matchId) {
       await base44.entities.ReaderMatch.update(matchId, { status: 'ended', ended_at: now });
     }
-    // End buddy's reverse match record
     const reverse = await base44.entities.ReaderMatch.filter({
       user_email: buddyEmail,
       matched_email: user?.email,
@@ -165,20 +391,40 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[80] bg-background/70 backdrop-blur-md flex items-end sm:items-center justify-center sm:px-4"
     >
       <motion.div
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 80, opacity: 0 }}
-        className="w-full sm:max-w-md bg-card border border-border/50 rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl"
-        style={{ height: '70vh' }}
+        initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
+        className="relative w-full sm:max-w-md bg-card border border-border/50 rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl overflow-hidden"
+        style={{ height: '75vh' }}
       >
+        {/* Call overlay */}
+        <AnimatePresence>
+          {showCall && (
+            <CallOverlay
+              matchId={matchId}
+              buddyEmail={buddyEmail}
+              callStatus={isIncomingCall ? buddyCallStatus : callStatus}
+              isIncoming={isIncomingCall}
+              onEnd={handleEndCall}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Read together overlay */}
+        <AnimatePresence>
+          {showReadTogether && (
+            <ReadTogetherPanel
+              matchId={matchId}
+              buddyEmail={buddyEmail}
+              onClose={() => setShowReadTogether(false)}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-border/30">
+        <div className="flex items-center gap-3 p-4 border-b border-border/30 shrink-0">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-primary flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-white">{buddyEmail?.[0]?.toUpperCase()}</span>
           </div>
@@ -187,13 +433,21 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
             {bookTitle && <p className="text-xs text-muted-foreground truncate">📚 {bookTitle}</p>}
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleEndChat}
-              className="text-xs text-muted-foreground hover:text-destructive gap-1 rounded-full"
-            >
-              <X className="w-3 h-3" /> จบแชท
+            {/* Read Together */}
+            <Button size="icon" variant="ghost" title="อ่านด้วยกัน"
+              onClick={() => setShowReadTogether(true)} className="h-8 w-8">
+              <BookOpen className="w-4 h-4 text-accent" />
+            </Button>
+            {/* Call */}
+            <Button size="icon" variant="ghost" title="โทร"
+              onClick={handleCall} disabled={callStatus !== 'idle'}
+              className="h-8 w-8">
+              <Phone className="w-4 h-4 text-green-400" />
+            </Button>
+            {/* End chat */}
+            <Button size="sm" variant="ghost" onClick={handleEndChat}
+              className="text-xs text-muted-foreground hover:text-destructive gap-1 rounded-full">
+              <X className="w-3 h-3" /> จบ
             </Button>
             <Button size="icon" variant="ghost" onClick={onClose} className="h-7 w-7">
               <X className="w-4 h-4" />
@@ -207,6 +461,16 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
             <div className="text-center py-8">
               <Heart className="w-8 h-8 text-rose-400 mx-auto mb-2 fill-rose-400" />
               <p className="text-sm text-muted-foreground">ทั้งคู่กดใจกันแล้ว เริ่มคุยได้เลย! 🎉</p>
+              <div className="flex gap-2 justify-center mt-3">
+                <button onClick={() => setShowReadTogether(true)}
+                  className="text-xs glass px-3 py-1.5 rounded-full text-accent hover:bg-accent/10 transition-colors flex items-center gap-1">
+                  <BookOpen className="w-3 h-3" /> อ่านด้วยกัน
+                </button>
+                <button onClick={handleCall}
+                  className="text-xs glass px-3 py-1.5 rounded-full text-green-400 hover:bg-green-400/10 transition-colors flex items-center gap-1">
+                  <Phone className="w-3 h-3" /> โทรหากัน
+                </button>
+              </div>
             </div>
           )}
           {messages.map(msg => {
@@ -232,7 +496,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
         </div>
 
         {/* Input */}
-        <div className="p-3 border-t border-border/30 flex gap-2">
+        <div className="p-3 border-t border-border/30 flex gap-2 shrink-0">
           <Input
             value={message}
             onChange={e => setMessage(e.target.value)}

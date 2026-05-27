@@ -90,8 +90,9 @@ export default function Matching() {
 
         // Mutual! Update both to accepted
         const myMatch = myMatches[0];
-        await base44.entities.ReaderMatch.update(myMatch.id, { status: 'accepted' });
-        await base44.entities.ReaderMatch.update(theyLikedMe[0].id, { status: 'accepted' });
+        const now = new Date().toISOString();
+        await base44.entities.ReaderMatch.update(myMatch.id, { status: 'accepted', accepted_at: now, popup_opened: false });
+        await base44.entities.ReaderMatch.update(theyLikedMe[0].id, { status: 'accepted', accepted_at: now, popup_opened: false });
 
         // Notify the buddy
         await base44.entities.Notification.create({

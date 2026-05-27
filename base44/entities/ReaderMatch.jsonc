@@ -45,15 +45,55 @@
       "type": "string",
       "format": "date-time"
     },
+    "accepted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
     "ended_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "popup_opened": {
+      "type": "boolean",
+      "default": false
     },
     "book_id": {
       "type": "string"
     },
     "book_title": {
       "type": "string"
+    },
+    "call_status": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "calling",
+        "in_call",
+        "ended"
+      ],
+      "default": "idle"
+    },
+    "call_initiated_by": {
+      "type": "string"
+    },
+    "sync_book_id": {
+      "type": "string"
+    },
+    "sync_book_title": {
+      "type": "string"
+    },
+    "sync_chapter_id": {
+      "type": "string"
+    },
+    "sync_chapter_number": {
+      "type": "number"
+    },
+    "sync_chapter_title": {
+      "type": "string"
+    },
+    "sync_active": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [

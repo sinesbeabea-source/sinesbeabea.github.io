@@ -5,42 +5,45 @@ import { AnimatePresence } from 'framer-motion';
 import MatchChatPopup from './MatchChatPopup';
 
 /**
- * Runs globally (in AppLayout) — polls every 5s to detect
- * when the current user has been mutually matched (status=accepted)
- * and opens the chat popup automatically.
+ * Polls every 5s for newly accepted matches (popup_opened=false).
+ * Marks popup_opened=true once shown so it won't re-trigger.
  */
 export default function GlobalMatchWatcher() {
   const { user } = useAuth();
-  const [chatPopup, setChatPopup] = useState(null); // { matchId, buddyEmail, bookTitle }
-  const seenMatchIds = useRef(new Set());
+  const [chatPopup, setChatPopup] = useState(null);
+  const processingRef = useRef(false);
 
   useEffect(() => {
     if (!user?.email) return;
 
     const check = async () => {
-      // Find my matches that just became accepted and I haven't shown popup for yet
-      const accepted = await base44.entities.ReaderMatch.filter({
-        user_email: user.email,
-        status: 'accepted',
-      });
-      for (const m of accepted) {
-        if (!seenMatchIds.current.has(m.id)) {
-          seenMatchIds.current.add(m.id);
-          // Only open if not already showing a popup
-          setChatPopup(prev => prev ? prev : {
+      if (processingRef.current) return;
+      processingRef.current = true;
+      try {
+        const accepted = await base44.entities.ReaderMatch.filter({
+          user_email: user.email,
+          status: 'accepted',
+          popup_opened: false,
+        });
+        if (accepted.length > 0 && !chatPopup) {
+          const m = accepted[0];
+          // Mark as popup shown before opening to prevent double-open
+          await base44.entities.ReaderMatch.update(m.id, { popup_opened: true });
+          setChatPopup({
             matchId: m.id,
             buddyEmail: m.matched_email,
             bookTitle: m.book_title,
           });
         }
+      } finally {
+        processingRef.current = false;
       }
     };
 
-    // Run immediately, then every 5s
     check();
     const interval = setInterval(check, 5000);
     return () => clearInterval(interval);
-  }, [user?.email]);
+  }, [user?.email, chatPopup]);
 
   return (
     <AnimatePresence>
