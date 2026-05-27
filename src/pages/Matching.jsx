@@ -8,13 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import GlassCard from '@/components/ui/GlassCard';
+import MatchNotificationPopup from '@/components/matching/MatchNotificationPopup';
+import { useNavigate } from 'react-router-dom';
 
 export default function Matching() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [profiles, setProfiles] = useState([]);
+  const [newMatch, setNewMatch] = useState(null);
 
   const { data: myMatches } = useQuery({
     queryKey: ['my-matches'],
@@ -60,7 +64,7 @@ export default function Matching() {
     const profile = profiles[currentIndex];
     if (!profile) return;
 
-    await base44.entities.ReaderMatch.create({
+    const created = await base44.entities.ReaderMatch.create({
       user_email: user?.email,
       matched_email: profile.email,
       match_percent: profile.match_percent,
@@ -69,6 +73,10 @@ export default function Matching() {
       status: action === 'like' ? 'accepted' : 'rejected',
     });
 
+    if (action === 'like') {
+      setNewMatch({ ...created, matched_email: profile.email, match_percent: profile.match_percent });
+    }
+
     queryClient.invalidateQueries({ queryKey: ['my-matches'] });
     setCurrentIndex(prev => prev + 1);
   };
@@ -76,8 +84,17 @@ export default function Matching() {
   const currentProfile = profiles[currentIndex];
   const hasMore = currentIndex < profiles.length;
 
+  const handleStartChat = (match) => {
+    navigate('/match-chat');
+  };
+
   return (
     <div className="min-h-screen px-4 py-8">
+      <MatchNotificationPopup
+        match={newMatch}
+        onClose={() => setNewMatch(null)}
+        onStartChat={handleStartChat}
+      />
       <div className="max-w-lg mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <h1 className="text-3xl font-space font-bold mb-2">
@@ -185,7 +202,12 @@ export default function Matching() {
                       {m.shared_genres?.slice(0, 2).map(g => <Badge key={g} variant="secondary" className="text-[10px]">{g}</Badge>)}
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-primary">{m.match_percent}%</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-primary">{m.match_percent}%</span>
+                    <Button size="sm" variant="outline" className="gap-1 h-7 text-xs border-primary/30 text-primary" onClick={() => navigate('/match-chat')}>
+                      <MessageCircle className="w-3 h-3" /> แชท
+                    </Button>
+                  </div>
                 </GlassCard>
               ))}
             </div>

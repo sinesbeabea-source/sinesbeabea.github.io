@@ -1,0 +1,26 @@
+{
+  "name": "UserAvatar",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "avatar_type": {
+      "type": "string",
+      "enum": [
+        "uploaded",
+        "default"
+      ],
+      "default": "default"
+    },
+    "default_avatar_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

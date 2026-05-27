@@ -1,0 +1,36 @@
+{
+  "name": "DeletedBook",
+  "type": "object",
+  "properties": {
+    "original_book_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    },
+    "cover_url": {
+      "type": "string"
+    },
+    "owner_email": {
+      "type": "string"
+    },
+    "deleted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "book_data": {
+      "type": "string"
+    },
+    "permanently_deleted": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "owner_email"
+  ]
+}

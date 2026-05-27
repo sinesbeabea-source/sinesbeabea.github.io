@@ -36,6 +36,8 @@ import Settings from '@/pages/Settings';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import ManageUsers from '@/pages/admin/ManageUsers';
 import ManageBooks from '@/pages/admin/ManageBooks';
+import Trash from '@/pages/Trash';
+import MatchChat from '@/pages/MatchChat';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -90,6 +92,10 @@ const AuthenticatedApp = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<ManageUsers />} />
           <Route path="/admin/books" element={<ManageBooks />} />
+
+          {/* New features */}
+          <Route path="/trash" element={<Trash />} />
+          <Route path="/match-chat" element={<MatchChat />} />
         </Route>
 
         {/* Reader - no layout for immersive experience */}

@@ -1,0 +1,37 @@
+{
+  "name": "CoinTransaction",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "earn",
+        "spend",
+        "daily_reward",
+        "purchase",
+        "refund",
+        "bonus"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "reference_id": {
+      "type": "string"
+    },
+    "balance_after": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "user_email",
+    "amount",
+    "type"
+  ]
+}
