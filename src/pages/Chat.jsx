@@ -18,13 +18,15 @@ export default function Chat() {
   const [newRoomName, setNewRoomName] = useState('');
   const messagesEndRef = useRef(null);
 
-  const { data: rooms } = useQuery({
-    queryKey: ['chat-rooms'],
-    queryFn: () => base44.entities.ChatRoom.list('-updated_date', 50),
+  const { data: myRooms } = useQuery({
+    queryKey: ['chat-rooms', user?.email],
+    queryFn: async () => {
+      const all = await base44.entities.ChatRoom.list('-updated_date', 100);
+      return all.filter(r => r.members?.includes(user?.email));
+    },
     initialData: [],
+    enabled: !!user,
   });
-
-  const myRooms = rooms.filter(r => r.members?.includes(user?.email));
 
   const { data: messages, refetch: refetchMessages } = useQuery({
     queryKey: ['messages', selectedRoom?.id],
@@ -95,11 +97,10 @@ export default function Chat() {
 
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            {myRooms.length === 0 && rooms.length === 0 && (
+            {myRooms.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-8">ยังไม่มีห้องแชท สร้างเลย!</p>
             )}
-            {/* Show my rooms first, then others */}
-            {[...myRooms, ...rooms.filter(r => !r.members?.includes(user?.email))].map(room => (
+            {myRooms.map(room => (
               <button
                 key={room.id}
                 onClick={() => joinRoom(room)}
