@@ -104,6 +104,7 @@ const AuthenticatedApp = () => {
         <Route path="/read/:bookId/:chapterId" element={<EbookReader />} />
       </Route>
 
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
