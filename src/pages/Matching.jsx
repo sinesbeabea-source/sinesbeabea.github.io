@@ -167,12 +167,33 @@ export default function Matching() {
   }, [mySession]);
 
   const handleLike = async (buddy) => {
-    // Create a ReaderMatch with status "liked"
     const existing = await base44.entities.ReaderMatch.filter({
       user_email: user?.email,
       matched_email: buddy.user_email,
     });
-    if (existing.length === 0) {
+
+    // Only skip if there's already an active (non-ended) like/accepted record
+    const activeRecord = existing.find(r => r.status === 'liked' || r.status === 'accepted');
+    if (activeRecord) {
+      setLikedEmails(prev => new Set([...prev, buddy.user_email]));
+      return;
+    }
+
+    // If old ended record exists, reuse it; otherwise create new
+    const endedRecord = existing.find(r => r.status === 'ended' || r.status === 'rejected' || r.status === 'skipped');
+    if (endedRecord) {
+      await base44.entities.ReaderMatch.update(endedRecord.id, {
+        status: 'liked',
+        liked_at: new Date().toISOString(),
+        book_id: selectedBook?.id,
+        book_title: selectedBook?.title,
+        popup_opened: false,
+        ended_at: null,
+        accepted_at: null,
+        sync_active: false,
+        call_status: 'idle',
+      });
+    } else {
       await base44.entities.ReaderMatch.create({
         user_email: user?.email,
         matched_email: buddy.user_email,
@@ -181,16 +202,18 @@ export default function Matching() {
         book_id: selectedBook?.id,
         book_title: selectedBook?.title,
       });
-      // Notify the buddy
-      await base44.entities.Notification.create({
-        user_email: buddy.user_email,
-        type: 'match',
-        title: '💙 มีคนกดใจคุณ!',
-        message: `${user?.full_name || user?.email?.split('@')[0]} กดใจคุณขณะอ่าน "${selectedBook?.title}"`,
-        from_user: user?.email,
-        link: '/matching',
-      });
     }
+
+    // Notify the buddy
+    await base44.entities.Notification.create({
+      user_email: buddy.user_email,
+      type: 'match',
+      title: '💙 มีคนกดใจคุณ!',
+      message: `${user?.full_name || user?.email?.split('@')[0]} กดใจคุณขณะอ่าน "${selectedBook?.title}"`,
+      from_user: user?.email,
+      link: '/matching',
+    });
+
     setLikedEmails(prev => new Set([...prev, buddy.user_email]));
   };
 
