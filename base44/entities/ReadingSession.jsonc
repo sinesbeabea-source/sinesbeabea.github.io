@@ -1,0 +1,44 @@
+{
+  "name": "ReadingSession",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of user currently reading"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "book_id": {
+      "type": "string",
+      "description": "Book being read"
+    },
+    "book_title": {
+      "type": "string"
+    },
+    "book_cover": {
+      "type": "string"
+    },
+    "book_author": {
+      "type": "string"
+    },
+    "last_active": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last heartbeat time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "searching",
+        "matched",
+        "offline"
+      ],
+      "default": "searching"
+    }
+  },
+  "required": [
+    "user_email",
+    "book_id"
+  ]
+}
