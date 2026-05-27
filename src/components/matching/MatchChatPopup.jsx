@@ -251,7 +251,7 @@ function CallOverlay({ matchId, buddyEmail, callStatus, isIncoming, onEnd }) {
 }
 
 // ─── Main Chat Popup ─────────────────────────────────────────────────
-export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose }) {
+export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose, onEnded }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [message, setMessage] = useState('');
@@ -379,13 +379,17 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
         await base44.entities.ReaderMatch.update(r.id, { status: 'ended', ended_at: now });
       }
     }
+    setConfirmEnd(false);
     setShowAfterChat(true);
   };
 
   if (showAfterChat) {
     return (
       <AnimatePresence>
-        <AfterChatPopup matchedEmail={buddyEmail} onClose={onClose} />
+        <AfterChatPopup
+          matchedEmail={buddyEmail}
+          onClose={() => { onEnded?.(); }}
+        />
       </AnimatePresence>
     );
   }
