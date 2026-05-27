@@ -257,6 +257,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
   const [message, setMessage] = useState('');
   const [showAfterChat, setShowAfterChat] = useState(false);
   const [showReadTogether, setShowReadTogether] = useState(false);
+  const [confirmEnd, setConfirmEnd] = useState(false);
   const messagesEndRef = useRef(null);
 
   const roomName = user?.email && buddyEmail
@@ -445,15 +446,37 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
               <Phone className="w-4 h-4 text-green-400" />
             </Button>
             {/* End chat */}
-            <Button size="sm" variant="ghost" onClick={handleEndChat}
+            <Button size="sm" variant="ghost" onClick={() => setConfirmEnd(true)}
               className="text-xs text-muted-foreground hover:text-destructive gap-1 rounded-full">
-              <X className="w-3 h-3" /> จบ
+              <PhoneOff className="w-3 h-3" /> จบแชท
             </Button>
-            <Button size="icon" variant="ghost" onClick={onClose} className="h-7 w-7">
+            {/* Minimize (just closes popup, chat still alive) */}
+            <Button size="icon" variant="ghost" onClick={onClose} title="ย่อ" className="h-7 w-7">
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
+
+        {/* Confirm end banner */}
+        <AnimatePresence>
+          {confirmEnd && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+              className="mx-3 mt-2 p-3 glass rounded-xl border border-destructive/30 flex items-center gap-3 shrink-0"
+            >
+              <div className="flex-1">
+                <p className="text-sm font-medium">จบการแมทช์นี้?</p>
+                <p className="text-xs text-muted-foreground">ทั้งสองฝ่ายจะออกจากแชทนี้</p>
+              </div>
+              <Button size="sm" variant="destructive" onClick={handleEndChat} className="text-xs rounded-full">
+                จบเลย
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setConfirmEnd(false)} className="text-xs rounded-full p-1.5">
+                <X className="w-3 h-3" />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
