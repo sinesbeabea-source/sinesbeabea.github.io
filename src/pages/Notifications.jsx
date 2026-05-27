@@ -49,12 +49,12 @@ export default function Notifications() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-space font-bold">Notifications</h1>
-            <p className="text-sm text-muted-foreground">{unreadCount} unread</p>
+            <h1 className="text-3xl font-space font-bold">การแจ้งเตือน</h1>
+            <p className="text-sm text-muted-foreground">{unreadCount} ยังไม่ได้อ่าน</p>
           </div>
           {unreadCount > 0 && (
             <Button variant="outline" size="sm" onClick={markAllRead} className="gap-2">
-              <CheckCheck className="w-4 h-4" /> Mark all read
+              <CheckCheck className="w-4 h-4" /> อ่านทั้งหมด
             </Button>
           )}
         </div>
@@ -84,7 +84,7 @@ export default function Notifications() {
           {notifications.length === 0 && (
             <div className="text-center py-16">
               <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">No notifications yet</p>
+              <p className="text-muted-foreground">ยังไม่มีการแจ้งเตือน</p>
             </div>
           )}
         </div>

@@ -21,25 +21,25 @@ function HeroSection() {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-6">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground">AI-Powered Reading Platform</span>
+            <span className="text-xs font-medium text-muted-foreground">แพลตฟอร์มการอ่านด้วย AI</span>
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-space font-bold leading-tight mb-6">
-            Discover Your Next
+            ค้นพบหนังสือ
             <br />
-            <span className="gradient-text">Favorite Book</span>
+            <span className="gradient-text">เล่มต่อไปของคุณ</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            AI-powered book discovery, reader matching, and community — all in one futuristic reading ecosystem.
+            ค้นพบหนังสือด้วย AI จับคู่นักอ่าน และชุมชนนักอ่าน — ครบในแพลตฟอร์มเดียว
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link to="/discover">
               <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-white rounded-full px-8 gap-2">
-                <Sparkles className="w-4 h-4" /> Explore Books
+                <Sparkles className="w-4 h-4" /> สำรวจหนังสือ
               </Button>
             </Link>
             <Link to="/write">
               <Button size="lg" variant="outline" className="rounded-full px-8 gap-2 border-primary/30 hover:bg-primary/10">
-                <PenTool className="w-4 h-4" /> Start Writing
+                <PenTool className="w-4 h-4" /> เริ่มเขียน
               </Button>
             </Link>
           </div>
@@ -51,10 +51,10 @@ function HeroSection() {
 
 function QuickActions() {
   const actions = [
-    { icon: ScanLine, label: 'AI Scanner', desc: 'Scan book covers', path: '/scanner', color: 'from-violet-500 to-purple-600' },
-    { icon: Users, label: 'Reader Match', desc: 'Find reading buddies', path: '/matching', color: 'from-cyan-500 to-blue-600' },
-    { icon: BookOpen, label: 'Community', desc: 'Join discussions', path: '/community', color: 'from-pink-500 to-rose-600' },
-    { icon: Sparkles, label: 'AI Discover', desc: 'Smart recommendations', path: '/discover', color: 'from-amber-500 to-orange-600' },
+    { icon: ScanLine, label: 'AI สแกนหนังสือ', desc: 'สแกนปกหนังสือ', path: '/scanner', color: 'from-violet-500 to-purple-600' },
+    { icon: Users, label: 'จับคู่นักอ่าน', desc: 'หาเพื่อนอ่านหนังสือ', path: '/matching', color: 'from-cyan-500 to-blue-600' },
+    { icon: BookOpen, label: 'ชุมชน', desc: 'ร่วมพูดคุย', path: '/community', color: 'from-pink-500 to-rose-600' },
+    { icon: Sparkles, label: 'AI ค้นพบ', desc: 'แนะนำอัจฉริยะ', path: '/discover', color: 'from-amber-500 to-orange-600' },
   ];
 
   return (
@@ -90,7 +90,7 @@ function BookSection({ title, icon: Icon, books, loading, linkTo }) {
           {linkTo && (
             <Link to={linkTo}>
               <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-primary">
-                See all <ArrowRight className="w-4 h-4" />
+                ดูทั้งหมด <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           )}
@@ -118,8 +118,8 @@ export default function Home() {
     <div>
       <HeroSection />
       <QuickActions />
-      <BookSection title="Trending Now" icon={TrendingUp} books={trendingBooks} loading={trendingLoading} linkTo="/discover" />
-      <BookSection title="Recently Added" icon={BookOpen} books={recentBooks} loading={recentLoading} linkTo="/discover" />
+      <BookSection title="กำลังนิยม" icon={TrendingUp} books={trendingBooks} loading={trendingLoading} linkTo="/discover" />
+      <BookSection title="เพิ่มล่าสุด" icon={BookOpen} books={recentBooks} loading={recentLoading} linkTo="/discover" />
     </div>
   );
 }

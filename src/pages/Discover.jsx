@@ -76,9 +76,9 @@ export default function Discover() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl font-space font-bold mb-2">
             <Sparkles className="inline w-7 h-7 text-primary mr-2" />
-            Discover Books
+            ค้นพบหนังสือ
           </h1>
-          <p className="text-muted-foreground">AI-powered search and curated recommendations</p>
+          <p className="text-muted-foreground">ค้นหาด้วย AI และคำแนะนำที่คัดสรรมาให้คุณ</p>
         </motion.div>
 
         {/* AI Search */}
@@ -89,7 +89,7 @@ export default function Discover() {
               <Input
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder='Try "dark fantasy with smart protagonist" or "emotional romance"'
+                placeholder='ลองพิมพ์ "แฟนตาซีมืดหม่น ตัวเอกฉลาด" หรือ "โรแมนซ์ซึ้งกินใจ"'
                 className="pl-10 h-12 glass rounded-xl border-primary/20 focus:border-primary"
               />
             </div>
@@ -108,21 +108,21 @@ export default function Discover() {
             <GlassCard hover={false} className="p-5">
               <div className="flex flex-wrap gap-4">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-2 block">Genre</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">แนว</label>
                   <Select value={selectedGenre} onValueChange={setSelectedGenre}>
                     <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Genres</SelectItem>
+                      <SelectItem value="all">ทุกแนว</SelectItem>
                       {GENRES.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-2 block">Mood</label>
+                  <label className="text-xs text-muted-foreground mb-2 block">อารมณ์</label>
                   <Select value={selectedMood} onValueChange={setSelectedMood}>
                     <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Moods</SelectItem>
+                      <SelectItem value="all">ทุกอารมณ์</SelectItem>
                       {MOODS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                     </SelectContent>
                   </Select>
@@ -138,7 +138,7 @@ export default function Discover() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" /> AI Results
+                  <Sparkles className="w-4 h-4 text-primary" /> ผลลัพธ์ AI
                 </h2>
                 {aiResults.interpretation && (
                   <p className="text-sm text-muted-foreground mt-1">{aiResults.interpretation}</p>
@@ -158,7 +158,7 @@ export default function Discover() {
             onClick={() => setSelectedGenre('all')}
             className={`cursor-pointer ${selectedGenre === 'all' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-primary/20'}`}
           >
-            All
+            ทั้งหมด
           </Badge>
           {GENRES.map(g => (
             <Badge

@@ -35,10 +35,10 @@ export default function Profile() {
   });
 
   const stats = [
-    { label: 'Books Read', value: myProgress.filter(p => p.status === 'finished').length, icon: BookOpen },
-    { label: 'Reading', value: myProgress.filter(p => p.status === 'reading').length, icon: Library },
-    { label: 'Uploaded', value: myBooks.length, icon: PenTool },
-    { label: 'Matches', value: myMatches.length, icon: Users },
+    { label: 'อ่านจบแล้ว', value: myProgress.filter(p => p.status === 'finished').length, icon: BookOpen },
+    { label: 'กำลังอ่าน', value: myProgress.filter(p => p.status === 'reading').length, icon: Library },
+    { label: 'อัปโหลด', value: myBooks.length, icon: PenTool },
+    { label: 'แมทช์', value: myMatches.length, icon: Users },
   ];
 
   return (
@@ -52,12 +52,12 @@ export default function Profile() {
                 {user?.full_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
               </span>
             </div>
-            <h1 className="text-2xl font-space font-bold mb-1">{user?.full_name || 'Reader'}</h1>
+            <h1 className="text-2xl font-space font-bold mb-1">{user?.full_name || 'นักอ่าน'}</h1>
             <p className="text-sm text-muted-foreground mb-4">{user?.email}</p>
             
             <div className="flex flex-wrap justify-center gap-2 mb-6">
-              <Badge className="bg-primary/10 text-primary">Book Lover</Badge>
-              <Badge className="bg-accent/10 text-accent">Explorer</Badge>
+              <Badge className="bg-primary/10 text-primary">คนรักหนังสือ</Badge>
+              <Badge className="bg-accent/10 text-accent">นักสำรวจ</Badge>
             </div>
 
             {/* Stats */}
@@ -76,10 +76,10 @@ export default function Profile() {
         {/* Quick Links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {[
-            { label: 'My Library', path: '/library', icon: Library },
-            { label: 'Upload Book', path: '/upload', icon: BookOpen },
-            { label: 'Write Novel', path: '/write', icon: PenTool },
-            { label: 'Settings', path: '/settings', icon: Settings },
+            { label: 'ชั้นหนังสือ', path: '/library', icon: Library },
+            { label: 'อัปโหลดหนังสือ', path: '/upload', icon: BookOpen },
+            { label: 'เขียนนิยาย', path: '/write', icon: PenTool },
+            { label: 'ตั้งค่า', path: '/settings', icon: Settings },
           ].map(link => (
             <Link key={link.path} to={link.path}>
               <GlassCard className="p-4 text-center">
@@ -93,14 +93,14 @@ export default function Profile() {
         {/* My Books */}
         {myBooks.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-space font-bold mb-4">My Books</h2>
+            <h2 className="text-xl font-space font-bold mb-4">หนังสือของฉัน</h2>
             <BookGrid books={myBooks} />
           </div>
         )}
 
         <div className="text-center">
           <Button variant="ghost" className="text-destructive gap-2" onClick={() => base44.auth.logout()}>
-            <LogOut className="w-4 h-4" /> Sign Out
+            <LogOut className="w-4 h-4" /> ออกจากระบบ
           </Button>
         </div>
       </div>

@@ -28,40 +28,40 @@ export default function Settings() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-3xl font-space font-bold mb-2">
             <SettingsIcon className="inline w-7 h-7 text-primary mr-2" />
-            Settings
+            ตั้งค่า
           </h1>
-          <p className="text-muted-foreground text-sm mb-8">Manage your account and preferences</p>
+          <p className="text-muted-foreground text-sm mb-8">จัดการบัญชีและการตั้งค่าของคุณ</p>
 
           <Tabs defaultValue="profile">
             <TabsList className="glass mb-6">
-              <TabsTrigger value="profile" className="gap-2"><User className="w-4 h-4" /> Profile</TabsTrigger>
-              <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" /> Notifications</TabsTrigger>
-              <TabsTrigger value="privacy" className="gap-2"><Shield className="w-4 h-4" /> Privacy</TabsTrigger>
+              <TabsTrigger value="profile" className="gap-2"><User className="w-4 h-4" /> โปรไฟล์</TabsTrigger>
+              <TabsTrigger value="notifications" className="gap-2"><Bell className="w-4 h-4" /> การแจ้งเตือน</TabsTrigger>
+              <TabsTrigger value="privacy" className="gap-2"><Shield className="w-4 h-4" /> ความเป็นส่วนตัว</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile">
               <GlassCard hover={false} className="p-6 space-y-6">
                 <div>
-                  <Label className="text-sm font-medium mb-2 block">Email</Label>
+                  <Label className="text-sm font-medium mb-2 block">อีเมล</Label>
                   <Input value={user?.email || ''} disabled className="bg-muted" />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium mb-2 block">Name</Label>
+                  <Label className="text-sm font-medium mb-2 block">ชื่อ</Label>
                   <Input value={user?.full_name || ''} disabled className="bg-muted" />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium mb-2 block">Bio</Label>
-                  <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell others about yourself..." rows={3} />
+                  <Label className="text-sm font-medium mb-2 block">แนะนำตัว</Label>
+                  <Textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="เล่าเกี่ยวกับตัวคุณให้คนอื่นรู้จัก..." rows={3} />
                 </div>
                 <Button onClick={handleSave} disabled={saving} className="gap-2">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} บันทึก
                 </Button>
               </GlassCard>
             </TabsContent>
 
             <TabsContent value="notifications">
               <GlassCard hover={false} className="p-6 space-y-4">
-                {['New messages', 'New followers', 'Match notifications', 'Book recommendations', 'Community updates'].map(item => (
+                {['ข้อความใหม่', 'ผู้ติดตามใหม่', 'การแจ้งเตือนแมทช์', 'แนะนำหนังสือ', 'อัปเดตชุมชน'].map(item => (
                   <div key={item} className="flex items-center justify-between">
                     <Label className="text-sm">{item}</Label>
                     <Switch defaultChecked />
@@ -72,7 +72,7 @@ export default function Settings() {
 
             <TabsContent value="privacy">
               <GlassCard hover={false} className="p-6 space-y-4">
-                {['Show reading activity', 'Show in reader matching', 'Allow direct messages', 'Show profile publicly'].map(item => (
+                {['แสดงกิจกรรมการอ่าน', 'แสดงในระบบจับคู่นักอ่าน', 'อนุญาตข้อความส่วนตัว', 'แสดงโปรไฟล์แบบสาธารณะ'].map(item => (
                   <div key={item} className="flex items-center justify-between">
                     <Label className="text-sm">{item}</Label>
                     <Switch defaultChecked />
@@ -84,7 +84,7 @@ export default function Settings() {
 
           <div className="mt-8 text-center">
             <Button variant="ghost" className="text-destructive gap-2" onClick={() => base44.auth.logout()}>
-              <LogOut className="w-4 h-4" /> Sign Out
+              <LogOut className="w-4 h-4" /> ออกจากระบบ
             </Button>
           </div>
         </motion.div>

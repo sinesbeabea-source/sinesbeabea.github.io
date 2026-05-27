@@ -31,9 +31,9 @@ export default function Library() {
   const getBooksByStatus = (status) => progress.filter(p => p.status === status).map(p => ({ ...p, book: bookMap[p.book_id] })).filter(p => p.book);
 
   const statusTabs = [
-    { value: 'reading', label: 'Reading', icon: BookOpen },
-    { value: 'want_to_read', label: 'Want to Read', icon: Bookmark },
-    { value: 'finished', label: 'Finished', icon: CheckCircle },
+    { value: 'reading', label: 'กำลังอ่าน', icon: BookOpen },
+    { value: 'want_to_read', label: 'อยากอ่าน', icon: Bookmark },
+    { value: 'finished', label: 'อ่านจบแล้ว', icon: CheckCircle },
   ];
 
   if (isLoading) {
@@ -46,9 +46,9 @@ export default function Library() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl font-space font-bold mb-2">
             <LibraryIcon className="inline w-7 h-7 text-primary mr-2" />
-            My Library
+            ชั้นหนังสือของฉัน
           </h1>
-          <p className="text-muted-foreground text-sm">{progress.length} books in your collection</p>
+          <p className="text-muted-foreground text-sm">{progress.length} เล่มในคอลเลกชันของคุณ</p>
         </motion.div>
 
         <Tabs defaultValue="reading">
@@ -65,7 +65,7 @@ export default function Library() {
           {statusTabs.map(tab => (
             <TabsContent key={tab.value} value={tab.value}>
               {getBooksByStatus(tab.value).length === 0 ? (
-                <p className="text-center text-muted-foreground py-12">No books here yet</p>
+                <p className="text-center text-muted-foreground py-12">ยังไม่มีหนังสือในหมวดนี้</p>
               ) : (
                 <div className="space-y-3">
                   {getBooksByStatus(tab.value).map((item, i) => (
@@ -85,12 +85,12 @@ export default function Library() {
                             {item.status === 'reading' && (
                               <div className="mt-2">
                                 <Progress value={item.progress_percent || 0} className="h-1" />
-                                <p className="text-[10px] text-muted-foreground mt-0.5">{item.progress_percent || 0}% complete</p>
+                                <p className="text-[10px] text-muted-foreground mt-0.5">{item.progress_percent || 0}% เสร็จแล้ว</p>
                               </div>
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground shrink-0">
-                            Ch. {item.current_chapter || 1}
+                            บทที่ {item.current_chapter || 1}
                           </div>
                         </GlassCard>
                       </Link>

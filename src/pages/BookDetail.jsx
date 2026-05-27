@@ -97,7 +97,7 @@ export default function BookDetail() {
             {/* Info */}
             <div className="flex-1 text-center md:text-left">
               <h1 className="text-3xl md:text-4xl font-space font-bold mb-2">{book.title}</h1>
-              <p className="text-lg text-muted-foreground mb-4">{book.author || 'Unknown Author'}</p>
+              <p className="text-lg text-muted-foreground mb-4">{book.author || 'ไม่ทราบผู้แต่ง'}</p>
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-6">
                 {book.rating > 0 && (
@@ -109,10 +109,10 @@ export default function BookDetail() {
                   </div>
                 )}
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Eye className="w-4 h-4" /> {book.read_count || 0} reads
+                  <Eye className="w-4 h-4" /> {book.read_count || 0} ครั้ง
                 </div>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <BookOpen className="w-4 h-4" /> {chapters.length} chapters
+                  <BookOpen className="w-4 h-4" /> {chapters.length} บท
                 </div>
               </div>
 
@@ -128,18 +128,18 @@ export default function BookDetail() {
                 {chapters.length > 0 && (
                   <Link to={`/read/${id}/${chapters[0]?.id}`}>
                     <Button size="lg" className="bg-gradient-to-r from-primary to-accent rounded-full gap-2 px-8">
-                      <BookOpen className="w-4 h-4" /> {myProgress?.status === 'reading' ? 'Continue Reading' : 'Start Reading'}
+                      <BookOpen className="w-4 h-4" /> {myProgress?.status === 'reading' ? 'อ่านต่อ' : 'เริ่มอ่าน'}
                     </Button>
                   </Link>
                 )}
                 <Select value={myProgress?.status || ''} onValueChange={(v) => addToLibrary.mutate(v)}>
                   <SelectTrigger className="w-44 rounded-full">
-                    <SelectValue placeholder="+ Add to Library" />
+                    <SelectValue placeholder="+ เพิ่มในชั้นหนังสือ" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="want_to_read">Want to Read</SelectItem>
-                    <SelectItem value="reading">Currently Reading</SelectItem>
-                    <SelectItem value="finished">Finished</SelectItem>
+                    <SelectItem value="want_to_read">อยากอ่าน</SelectItem>
+                    <SelectItem value="reading">กำลังอ่าน</SelectItem>
+                    <SelectItem value="finished">อ่านจบแล้ว</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -147,7 +147,7 @@ export default function BookDetail() {
               {myProgress && (
                 <div className="mt-4 max-w-xs">
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                    <span>Progress</span>
+                    <span>ความคืบหน้า</span>
                     <span>{myProgress.progress_percent || 0}%</span>
                   </div>
                   <Progress value={myProgress.progress_percent || 0} className="h-1.5" />
@@ -163,7 +163,7 @@ export default function BookDetail() {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Chapters */}
           <div className="md:col-span-2">
-            <h2 className="text-xl font-space font-bold mb-4">Chapters</h2>
+            <h2 className="text-xl font-space font-bold mb-4">บทต่างๆ</h2>
             <div className="space-y-2">
               {chapters.map((ch, i) => (
                 <Link key={ch.id} to={`/read/${id}/${ch.id}`}>
@@ -176,14 +176,14 @@ export default function BookDetail() {
                   </GlassCard>
                 </Link>
               ))}
-              {chapters.length === 0 && <p className="text-muted-foreground text-sm">No chapters published yet</p>}
+              {chapters.length === 0 && <p className="text-muted-foreground text-sm">ยังไม่มีบทที่เผยแพร่</p>}
             </div>
           </div>
 
           {/* Reviews */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-space font-bold">Reviews</h2>
+              <h2 className="text-xl font-space font-bold">รีวิว</h2>
               <Button variant="ghost" size="sm" onClick={() => setShowReviewForm(!showReviewForm)}>
                 <Plus className="w-4 h-4" />
               </Button>
@@ -200,9 +200,9 @@ export default function BookDetail() {
                     />
                   ))}
                 </div>
-                <Textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Write your review..." className="mb-3" />
+                <Textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="เขียนรีวิวของคุณ..." className="mb-3" />
                 <Button size="sm" onClick={() => submitReview.mutate()} disabled={submitReview.isPending}>
-                  {submitReview.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
+                  {submitReview.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'ส่งรีวิว'}
                 </Button>
               </GlassCard>
             )}
@@ -219,7 +219,7 @@ export default function BookDetail() {
                   <p className="text-xs text-muted-foreground mt-2">{r.created_by}</p>
                 </GlassCard>
               ))}
-              {reviews.length === 0 && <p className="text-sm text-muted-foreground">No reviews yet</p>}
+              {reviews.length === 0 && <p className="text-sm text-muted-foreground">ยังไม่มีรีวิว</p>}
             </div>
           </div>
         </div>

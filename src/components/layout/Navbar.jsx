@@ -16,11 +16,11 @@ export default function Navbar({ user, notificationCount = 0 }) {
   const location = useLocation();
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Home' },
-    { path: '/discover', icon: Sparkles, label: 'Discover' },
-    { path: '/scanner', icon: ScanLine, label: 'Scanner' },
-    { path: '/matching', icon: Users, label: 'Match' },
-    { path: '/community', icon: BookOpen, label: 'Community' },
+    { path: '/', icon: Home, label: 'หน้าหลัก' },
+    { path: '/discover', icon: Sparkles, label: 'ค้นพบ' },
+    { path: '/scanner', icon: ScanLine, label: 'สแกน' },
+    { path: '/matching', icon: Users, label: 'จับคู่' },
+    { path: '/community', icon: BookOpen, label: 'ชุมชน' },
   ];
 
   const handleSearch = (e) => {
@@ -112,12 +112,12 @@ export default function Navbar({ user, notificationCount = 0 }) {
                 ))}
                 <Link to="/library" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground">
-                    <Library className="w-4 h-4" /> My Library
+                    <Library className="w-4 h-4" /> ชั้นหนังสือ
                   </Button>
                 </Link>
                 <Link to="/write" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground">
-                    <PenTool className="w-4 h-4" /> Write
+                    <PenTool className="w-4 h-4" /> เขียน
                   </Button>
                 </Link>
               </div>
@@ -150,12 +150,12 @@ export default function Navbar({ user, notificationCount = 0 }) {
                     autoFocus
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search books, authors, genres... Try 'dark fantasy with smart protagonist'"
+                    placeholder="ค้นหาหนังสือ นักเขียน แนว... ลองพิมพ์ 'แฟนตาซีมืด ตัวเอกฉลาด'"
                     className="pl-12 pr-4 h-14 text-lg glass rounded-2xl border-primary/30 focus:border-primary"
                   />
                 </div>
               </form>
-              <p className="text-xs text-muted-foreground mt-3 text-center">AI-powered natural language search</p>
+              <p className="text-xs text-muted-foreground mt-3 text-center">ค้นหาด้วย AI ภาษาธรรมชาติ</p>
             </motion.div>
           </motion.div>
         )}

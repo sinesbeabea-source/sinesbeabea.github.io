@@ -79,15 +79,15 @@ export default function Chat() {
       <div className={`w-full md:w-80 border-r border-border/30 flex flex-col ${selectedRoom ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-border/30">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-space font-bold text-lg">Chats</h2>
+            <h2 className="font-space font-bold text-lg">แชท</h2>
             <Dialog>
               <DialogTrigger asChild>
                 <Button size="icon" variant="ghost"><Plus className="w-4 h-4" /></Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle>Create Chat Room</DialogTitle></DialogHeader>
-                <Input value={newRoomName} onChange={e => setNewRoomName(e.target.value)} placeholder="Room name..." />
-                <Button onClick={() => createRoom.mutate()} disabled={!newRoomName.trim()}>Create</Button>
+                <DialogHeader><DialogTitle>สร้างห้องแชท</DialogTitle></DialogHeader>
+                <Input value={newRoomName} onChange={e => setNewRoomName(e.target.value)} placeholder="ชื่อห้อง..." />
+                <Button onClick={() => createRoom.mutate()} disabled={!newRoomName.trim()}>สร้าง</Button>
               </DialogContent>
             </Dialog>
           </div>
@@ -96,7 +96,7 @@ export default function Chat() {
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
             {myRooms.length === 0 && rooms.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-8">No chat rooms yet. Create one!</p>
+              <p className="text-sm text-muted-foreground text-center py-8">ยังไม่มีห้องแชท สร้างเลย!</p>
             )}
             {/* Show my rooms first, then others */}
             {[...myRooms, ...rooms.filter(r => !r.members?.includes(user?.email))].map(room => (
@@ -134,7 +134,7 @@ export default function Chat() {
               </div>
               <div>
                 <p className="font-medium text-sm">{selectedRoom.name}</p>
-                <p className="text-xs text-muted-foreground">{selectedRoom.members?.length} members</p>
+                <p className="text-xs text-muted-foreground">{selectedRoom.members?.length} สมาชิก</p>
               </div>
             </div>
 
@@ -162,7 +162,7 @@ export default function Chat() {
                 <Input
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  placeholder="Type a message..."
+                  placeholder="พิมพ์ข้อความ..."
                   className="flex-1 rounded-full glass"
                 />
                 <Button type="submit" size="icon" className="rounded-full bg-gradient-to-r from-primary to-accent shrink-0" disabled={!message.trim()}>
@@ -175,7 +175,7 @@ export default function Chat() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <MessageCircle className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Select a chat to start messaging</p>
+              <p className="text-muted-foreground">เลือกห้องแชทเพื่อเริ่มสนทนา</p>
             </div>
           </div>
         )}

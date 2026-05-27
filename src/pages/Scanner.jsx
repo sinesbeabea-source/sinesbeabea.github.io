@@ -68,13 +68,13 @@ export default function Scanner() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-4">
             <ScanLine className="w-4 h-4 text-primary" />
-            <span className="text-xs font-medium">AI Book Scanner</span>
+            <span className="text-xs font-medium">AI สแกนหนังสือ</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-space font-bold mb-3">
-            Scan & <span className="gradient-text">Identify</span> Books
+            สแกน & <span className="gradient-text">ระบุ</span> หนังสือ
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Upload a book cover and our AI will identify it, analyze the mood, genre, and find it in our library.
+            อัปโหลดปกหนังสือ แล้ว AI จะระบุชื่อ วิเคราะห์อารมณ์ แนว และค้นหาในคลังหนังสือ
           </p>
         </motion.div>
 
@@ -89,8 +89,8 @@ export default function Scanner() {
               ) : (
                 <Upload className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               )}
-              <p className="font-medium mb-1">{scanning ? 'AI is analyzing...' : 'Upload Book Cover'}</p>
-              <p className="text-sm text-muted-foreground">Drop an image or click to browse</p>
+              <p className="font-medium mb-1">{scanning ? 'AI กำลังวิเคราะห์...' : 'อัปโหลดปกหนังสือ'}</p>
+              <p className="text-sm text-muted-foreground">ลากไฟล์หรือคลิกเพื่อเลือก</p>
             </GlassCard>
             <input type="file" accept="image/*" className="hidden" onChange={handleScan} disabled={scanning} />
           </label>
@@ -105,7 +105,7 @@ export default function Scanner() {
                 <GlassCard hover={false} glow className="p-6 mb-8">
                   <div className="flex items-center gap-2 mb-4">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    <h2 className="text-lg font-bold">Book Found!</h2>
+                    <h2 className="text-lg font-bold">พบหนังสือแล้ว!</h2>
                   </div>
                   <div className="flex gap-4">
                     <div className="w-24 aspect-[2/3] rounded-lg overflow-hidden shrink-0">
@@ -115,7 +115,7 @@ export default function Scanner() {
                       <h3 className="font-bold text-lg">{result.matchedBook.title}</h3>
                       <p className="text-sm text-muted-foreground mb-2">{result.matchedBook.author}</p>
                       <Link to={`/book/${result.matchedBook.id}`}>
-                        <Button size="sm" className="gap-2"><BookOpen className="w-3 h-3" /> View Book</Button>
+                        <Button size="sm" className="gap-2"><BookOpen className="w-3 h-3" /> ดูหนังสือ</Button>
                       </Link>
                     </div>
                   </div>
@@ -127,21 +127,21 @@ export default function Scanner() {
                 <GlassCard hover={false} className="p-6 mb-8 border-destructive/30">
                   <div className="flex items-center gap-2 mb-3">
                     <AlertCircle className="w-5 h-5 text-destructive" />
-                    <h2 className="text-lg font-bold">Book Not Found</h2>
+                    <h2 className="text-lg font-bold">ไม่พบหนังสือ</h2>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">This book isn't in our library yet.</p>
+                  <p className="text-sm text-muted-foreground mb-2">หนังสือเล่มนี้ยังไม่อยู่ในคลังของเรา</p>
                 </GlassCard>
               )}
 
               {/* Analysis */}
               <GlassCard hover={false} className="p-6 mb-8">
-                <h3 className="font-bold mb-4">AI Analysis</h3>
+                <h3 className="font-bold mb-4">ผลการวิเคราะห์ AI</h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-muted-foreground">Title:</span> <span className="font-medium">{result.detected_title}</span></div>
-                  <div><span className="text-muted-foreground">Author:</span> <span className="font-medium">{result.detected_author}</span></div>
-                  <div><span className="text-muted-foreground">Genre:</span> <span className="font-medium">{result.detected_genre}</span></div>
-                  <div><span className="text-muted-foreground">Mood:</span> <span className="font-medium">{result.detected_mood}</span></div>
-                  <div><span className="text-muted-foreground">Reader Type:</span> <span className="font-medium">{result.reader_type}</span></div>
+                  <div><span className="text-muted-foreground">ชื่อเรื่อง:</span> <span className="font-medium">{result.detected_title}</span></div>
+                  <div><span className="text-muted-foreground">ผู้แต่ง:</span> <span className="font-medium">{result.detected_author}</span></div>
+                  <div><span className="text-muted-foreground">แนว:</span> <span className="font-medium">{result.detected_genre}</span></div>
+                  <div><span className="text-muted-foreground">อารมณ์:</span> <span className="font-medium">{result.detected_mood}</span></div>
+                  <div><span className="text-muted-foreground">ประเภทนักอ่าน:</span> <span className="font-medium">{result.reader_type}</span></div>
                 </div>
                 {result.summary && <p className="text-sm text-muted-foreground mt-4">{result.summary}</p>}
                 {result.keywords?.length > 0 && (
@@ -154,7 +154,7 @@ export default function Scanner() {
               {/* Similar Books */}
               {similarBooks.length > 0 && (
                 <div>
-                  <h3 className="font-bold mb-4">Similar Books You Might Like</h3>
+                  <h3 className="font-bold mb-4">หนังสือที่คล้ายกัน</h3>
                   <BookGrid books={similarBooks} />
                 </div>
               )}

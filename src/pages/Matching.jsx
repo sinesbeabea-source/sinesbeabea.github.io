@@ -84,7 +84,7 @@ export default function Matching() {
             <Users className="inline w-7 h-7 text-primary mr-2" />
             Reader <span className="gradient-text">Match</span>
           </h1>
-          <p className="text-muted-foreground text-sm">Find readers who share your taste in books</p>
+          <p className="text-muted-foreground text-sm">หานักอ่านที่มีรสนิยมเดียวกับคุณ</p>
         </motion.div>
 
         {profiles.length === 0 && (
@@ -92,11 +92,11 @@ export default function Matching() {
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
               <Heart className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">Ready to Find Your Reading Match?</h2>
-            <p className="text-sm text-muted-foreground mb-6">AI will analyze reading preferences and suggest compatible readers.</p>
+            <h2 className="text-lg font-semibold mb-2">พร้อมหาคู่อ่านหนังสือแล้วหรือยัง?</h2>
+            <p className="text-sm text-muted-foreground mb-6">AI จะวิเคราะห์รสนิยมการอ่านและแนะนำนักอ่านที่เข้ากันได้</p>
             <Button onClick={generateMatches} disabled={generating} className="bg-gradient-to-r from-primary to-accent rounded-full px-8 gap-2">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-              Find Matches
+              หาแมทช์
             </Button>
           </div>
         )}
@@ -124,7 +124,7 @@ export default function Matching() {
 
                 <div className="mb-4">
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Match</span>
+                    <span className="text-muted-foreground">ความเข้ากัน</span>
                     <span className="font-bold text-primary">{currentProfile.match_percent}%</span>
                   </div>
                   <Progress value={currentProfile.match_percent} className="h-2" />
@@ -154,7 +154,7 @@ export default function Matching() {
                   </Button>
                 </div>
 
-                <p className="text-xs text-muted-foreground mt-4">{currentIndex + 1} / {profiles.length}</p>
+                <p className="text-xs text-muted-foreground mt-4">{currentIndex + 1} / {profiles.length} คน</p>
               </GlassCard>
             </motion.div>
           )}
@@ -162,9 +162,9 @@ export default function Matching() {
 
         {profiles.length > 0 && !hasMore && (
           <div className="text-center py-16">
-            <p className="text-muted-foreground mb-4">You've seen all matches!</p>
+            <p className="text-muted-foreground mb-4">คุณดูครบทุกคนแล้ว!</p>
             <Button onClick={generateMatches} disabled={generating} variant="outline" className="rounded-full gap-2">
-              <Sparkles className="w-4 h-4" /> Find More
+              <Sparkles className="w-4 h-4" /> หาเพิ่ม
             </Button>
           </div>
         )}
@@ -172,7 +172,7 @@ export default function Matching() {
         {/* Accepted Matches */}
         {myMatches.length > 0 && (
           <div className="mt-12">
-            <h3 className="text-lg font-bold mb-4">Your Matches ({myMatches.length})</h3>
+            <h3 className="text-lg font-bold mb-4">แมทช์ของคุณ ({myMatches.length})</h3>
             <div className="space-y-3">
               {myMatches.map(m => (
                 <GlassCard key={m.id} className="flex items-center gap-3 p-3">

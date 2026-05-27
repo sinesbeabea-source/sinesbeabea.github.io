@@ -60,30 +60,30 @@ export default function Community() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-space font-bold">Community</h1>
-            <p className="text-muted-foreground text-sm">Discuss books, share quotes, write reviews</p>
+            <h1 className="text-3xl font-space font-bold">ชุมชนนักอ่าน</h1>
+            <p className="text-muted-foreground text-sm">พูดคุยเรื่องหนังสือ แชร์คำคม และเขียนรีวิว</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-gradient-to-r from-primary to-accent rounded-full">
-                <Plus className="w-4 h-4" /> New Post
+                <Plus className="w-4 h-4" /> โพสต์ใหม่
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogHeader><DialogTitle>Create Post</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>สร้างโพสต์</DialogTitle></DialogHeader>
               <Select value={newType} onValueChange={setNewType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="discussion">Discussion</SelectItem>
-                  <SelectItem value="review">Review</SelectItem>
-                  <SelectItem value="quote">Quote</SelectItem>
-                  <SelectItem value="recommendation">Recommendation</SelectItem>
+                  <SelectItem value="discussion">พูดคุย</SelectItem>
+                  <SelectItem value="review">รีวิว</SelectItem>
+                  <SelectItem value="quote">คำคม</SelectItem>
+                  <SelectItem value="recommendation">แนะนำ</SelectItem>
                 </SelectContent>
               </Select>
-              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Title..." />
-              <Textarea value={newContent} onChange={e => setNewContent(e.target.value)} placeholder="Write your post..." rows={5} />
+              <Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="หัวข้อ..." />
+              <Textarea value={newContent} onChange={e => setNewContent(e.target.value)} placeholder="เขียนโพสต์ของคุณ..." rows={5} />
               <Button onClick={() => createPost.mutate()} disabled={!newTitle.trim() || createPost.isPending}>
-                {createPost.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null} Post
+                {createPost.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null} โพสต์
               </Button>
             </DialogContent>
           </Dialog>
@@ -91,8 +91,8 @@ export default function Community() {
 
         <Tabs defaultValue="latest">
           <TabsList className="glass mb-6">
-            <TabsTrigger value="latest">Latest</TabsTrigger>
-            <TabsTrigger value="trending">Trending</TabsTrigger>
+            <TabsTrigger value="latest">ล่าสุด</TabsTrigger>
+            <TabsTrigger value="trending">กำลังนิยม</TabsTrigger>
           </TabsList>
 
           <TabsContent value="latest">
@@ -109,7 +109,7 @@ export default function Community() {
 
 function PostList({ posts, loading, likePost, typeColors }) {
   if (loading) return <div className="text-center py-8"><Loader2 className="w-6 h-6 animate-spin mx-auto" /></div>;
-  if (!posts?.length) return <p className="text-center text-muted-foreground py-8">No posts yet. Be the first!</p>;
+  if (!posts?.length) return <p className="text-center text-muted-foreground py-8">ยังไม่มีโพสต์ เป็นคนแรกสิ!</p>;
 
   return (
     <div className="space-y-4">
