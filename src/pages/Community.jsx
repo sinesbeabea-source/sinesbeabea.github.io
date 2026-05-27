@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
 import { MessageSquare, Heart, Plus, TrendingUp, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -120,7 +121,9 @@ function PostList({ posts, loading, likePost, typeColors }) {
               <div className="flex items-center gap-2">
                 <Badge className={`${typeColors[post.post_type] || typeColors.discussion} text-xs`}>{post.post_type}</Badge>
               </div>
-              <span className="text-xs text-muted-foreground">@{post.created_by?.split('@')[0]}</span>
+              <Link to={`/user/${encodeURIComponent(post.created_by)}`} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                @{post.created_by?.split('@')[0]}
+              </Link>
             </div>
             <h3 className="font-bold mb-2">{post.title}</h3>
             <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{post.content}</p>

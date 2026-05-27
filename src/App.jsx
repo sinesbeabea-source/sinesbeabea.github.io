@@ -21,7 +21,6 @@ import Home from '@/pages/Home';
 import Discover from '@/pages/Discover';
 import BookDetail from '@/pages/BookDetail';
 import EbookReader from '@/pages/EbookReader';
-import Scanner from '@/pages/Scanner';
 import Matching from '@/pages/Matching';
 import Chat from '@/pages/Chat';
 import Community from '@/pages/Community';
@@ -39,6 +38,8 @@ import ManageBooks from '@/pages/admin/ManageBooks';
 import Trash from '@/pages/Trash';
 import MatchChat from '@/pages/MatchChat';
 import CoinShop from '@/pages/CoinShop';
+import BookClubs from '@/pages/BookClubs';
+import UserProfile from '@/pages/UserProfile';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -77,7 +78,6 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<Home />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/book/:id" element={<BookDetail />} />
-          <Route path="/scanner" element={<Scanner />} />
           <Route path="/matching" element={<Matching />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/community" element={<Community />} />
@@ -98,6 +98,8 @@ const AuthenticatedApp = () => {
           <Route path="/trash" element={<Trash />} />
           <Route path="/match-chat" element={<MatchChat />} />
           <Route path="/coin-shop" element={<CoinShop />} />
+          <Route path="/book-clubs" element={<BookClubs />} />
+          <Route path="/user/:email" element={<UserProfile />} />
         </Route>
 
         {/* Reader - no layout for immersive experience */}

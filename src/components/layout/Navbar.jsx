@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, Search, Bell, MessageCircle, User, Menu, X, 
-  Sparkles, Home, Users, PenTool, Library, ScanLine
+  Sparkles, Home, Users, PenTool, Library, UsersRound
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +29,7 @@ export default function Navbar({ user, notificationCount = 0 }) {
   const navItems = [
     { path: '/', icon: Home, label: 'หน้าหลัก' },
     { path: '/discover', icon: Sparkles, label: 'ค้นพบ' },
-    { path: '/scanner', icon: ScanLine, label: 'สแกน' },
+    { path: '/book-clubs', icon: UsersRound, label: 'คลับ' },
     { path: '/matching', icon: Users, label: 'จับคู่' },
     { path: '/community', icon: BookOpen, label: 'ชุมชน' },
   ];
@@ -121,6 +121,11 @@ export default function Navbar({ user, notificationCount = 0 }) {
                 <Link to="/write" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground">
                     <PenTool className="w-4 h-4" /> เขียน
+                  </Button>
+                </Link>
+                <Link to="/coin-shop" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground">
+                    <Sparkles className="w-4 h-4" /> เหรียญ
                   </Button>
                 </Link>
               </div>
