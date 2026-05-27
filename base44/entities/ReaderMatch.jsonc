@@ -33,11 +33,27 @@
       "type": "string",
       "enum": [
         "pending",
+        "liked",
         "accepted",
         "rejected",
-        "skipped"
+        "skipped",
+        "ended"
       ],
       "default": "pending"
+    },
+    "liked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "book_id": {
+      "type": "string"
+    },
+    "book_title": {
+      "type": "string"
     }
   },
   "required": [
