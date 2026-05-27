@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { motion } from 'framer-motion';
-import { Star, BookOpen, Clock, Eye, Heart, Share2, ChevronRight, MessageSquare, Loader2, Plus } from 'lucide-react';
+import { Star, BookOpen, Eye, ChevronRight, Loader2, Plus, Lock, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +31,15 @@ export default function BookDetail() {
     queryFn: () => base44.entities.Chapter.filter({ book_id: id, status: 'published' }, 'chapter_number', 100),
     initialData: [],
   });
+
+  const { data: purchasedChapters } = useQuery({
+    queryKey: ['purchased', user?.email],
+    queryFn: () => base44.entities.PurchasedChapter.filter({ user_email: user?.email }),
+    enabled: !!user,
+    initialData: [],
+  });
+
+  const purchasedIds = new Set(purchasedChapters.map(p => p.chapter_id));
 
   const { data: reviews } = useQuery({
     queryKey: ['reviews', id],
@@ -165,17 +174,37 @@ export default function BookDetail() {
           <div className="md:col-span-2">
             <h2 className="text-xl font-space font-bold mb-4">บทต่างๆ</h2>
             <div className="space-y-2">
-              {chapters.map((ch, i) => (
-                <Link key={ch.id} to={`/read/${id}/${ch.id}`}>
-                  <GlassCard className="flex items-center justify-between p-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-muted-foreground w-8">#{ch.chapter_number || i + 1}</span>
-                      <span className="text-sm font-medium">{ch.title}</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </GlassCard>
-                </Link>
-              ))}
+              {chapters.map((ch, i) => {
+                const isPremium = ch.is_premium;
+                const isOwned = purchasedIds.has(ch.id) || ch.created_by === user?.email;
+                const locked = isPremium && !isOwned;
+                return (
+                  <Link key={ch.id} to={`/read/${id}/${ch.id}`}>
+                    <GlassCard className={`flex items-center justify-between p-3 ${locked ? 'opacity-80' : ''}`}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-muted-foreground w-8">#{ch.chapter_number || i + 1}</span>
+                        <div>
+                          <span className="text-sm font-medium">{ch.title}</span>
+                          {isPremium && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <Badge className="text-[9px] h-4 px-1.5 bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                พรีเมียม
+                              </Badge>
+                              <div className="flex items-center gap-0.5 text-[10px] text-yellow-400">
+                                <Coins className="w-2.5 h-2.5" /> 10
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {locked
+                        ? <Lock className="w-4 h-4 text-yellow-400" />
+                        : <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      }
+                    </GlassCard>
+                  </Link>
+                );
+              })}
               {chapters.length === 0 && <p className="text-muted-foreground text-sm">ยังไม่มีบทที่เผยแพร่</p>}
             </div>
           </div>

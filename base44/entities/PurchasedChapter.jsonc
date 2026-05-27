@@ -1,0 +1,31 @@
+{
+  "name": "PurchasedChapter",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "chapter_id": {
+      "type": "string"
+    },
+    "book_id": {
+      "type": "string"
+    },
+    "chapter_title": {
+      "type": "string"
+    },
+    "coins_spent": {
+      "type": "number",
+      "default": 10
+    },
+    "purchased_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_email",
+    "chapter_id",
+    "book_id"
+  ]
+}

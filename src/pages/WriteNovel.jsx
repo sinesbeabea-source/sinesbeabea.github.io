@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { PenTool, Plus, Save, Sparkles, Loader2, Trash2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { PenTool, Plus, Save, Sparkles, Loader2, Trash2, Eye, EyeOff, ArrowLeft, Lock, Unlock, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,6 +72,15 @@ export default function WriteNovel() {
   const togglePublish = async (ch) => {
     const newStatus = ch.status === 'published' ? 'draft' : 'published';
     await base44.entities.Chapter.update(ch.id, { status: newStatus });
+    refetchChapters();
+  };
+
+  const togglePremium = async (ch, e) => {
+    e.stopPropagation();
+    await base44.entities.Chapter.update(ch.id, {
+      is_premium: !ch.is_premium,
+      coin_price: !ch.is_premium ? 10 : 0,
+    });
     refetchChapters();
   };
 
@@ -155,7 +164,11 @@ export default function WriteNovel() {
               onClick={() => setSelectedChapter(ch)}
             >
               <span className="flex-1 truncate">#{ch.chapter_number || i + 1} {ch.title}</span>
+              {ch.is_premium && <Coins className="w-3 h-3 text-yellow-400 shrink-0" />}
               <div className="hidden group-hover:flex items-center gap-1">
+                <button onClick={(e) => togglePremium(ch, e)} title={ch.is_premium ? 'ปลดล็อกฟรี' : 'ตั้งเป็นพรีเมียม (10 coins)'}>
+                  {ch.is_premium ? <Lock className="w-3 h-3 text-yellow-400" /> : <Unlock className="w-3 h-3 text-muted-foreground" />}
+                </button>
                 <button onClick={(e) => { e.stopPropagation(); togglePublish(ch); }}>
                   {ch.status === 'published' ? <Eye className="w-3 h-3 text-green-500" /> : <EyeOff className="w-3 h-3 text-muted-foreground" />}
                 </button>
