@@ -1,0 +1,37 @@
+{
+  "name": "ChatMessage",
+  "type": "object",
+  "properties": {
+    "room_id": {
+      "type": "string",
+      "description": "Chat room identifier"
+    },
+    "sender_email": {
+      "type": "string"
+    },
+    "sender_name": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "book_share",
+        "image",
+        "system"
+      ],
+      "default": "text"
+    },
+    "book_id": {
+      "type": "string",
+      "description": "Shared book reference"
+    }
+  },
+  "required": [
+    "room_id",
+    "content"
+  ]
+}

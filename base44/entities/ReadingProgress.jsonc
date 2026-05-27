@@ -1,0 +1,34 @@
+{
+  "name": "ReadingProgress",
+  "type": "object",
+  "properties": {
+    "book_id": {
+      "type": "string"
+    },
+    "current_chapter": {
+      "type": "number",
+      "default": 1
+    },
+    "progress_percent": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "want_to_read",
+        "reading",
+        "finished",
+        "dropped"
+      ],
+      "default": "want_to_read"
+    },
+    "last_read_date": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "book_id"
+  ]
+}

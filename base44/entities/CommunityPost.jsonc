@@ -1,0 +1,43 @@
+{
+  "name": "CommunityPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "post_type": {
+      "type": "string",
+      "enum": [
+        "discussion",
+        "review",
+        "quote",
+        "recommendation"
+      ],
+      "default": "discussion"
+    },
+    "book_id": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "like_count": {
+      "type": "number",
+      "default": 0
+    },
+    "comment_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}

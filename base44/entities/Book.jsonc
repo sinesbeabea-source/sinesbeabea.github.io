@@ -1,0 +1,120 @@
+{
+  "name": "Book",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Book title"
+    },
+    "author": {
+      "type": "string",
+      "description": "Author name"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Cover image URL"
+    },
+    "description": {
+      "type": "string",
+      "description": "Book description/synopsis"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Genre tags"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Smart tags"
+    },
+    "mood": {
+      "type": "string",
+      "enum": [
+        "dark",
+        "emotional",
+        "relaxing",
+        "horror",
+        "action",
+        "psychological",
+        "romantic",
+        "mystery",
+        "adventure",
+        "comedy"
+      ],
+      "description": "Book mood"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Average rating 0-5"
+    },
+    "rating_count": {
+      "type": "number",
+      "description": "Number of ratings"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "unpublished",
+        "pending_review",
+        "rejected"
+      ],
+      "default": "draft"
+    },
+    "content_rating": {
+      "type": "string",
+      "enum": [
+        "general",
+        "teen",
+        "mature"
+      ],
+      "default": "general"
+    },
+    "book_type": {
+      "type": "string",
+      "enum": [
+        "uploaded",
+        "written",
+        "official"
+      ],
+      "default": "uploaded"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false
+    },
+    "coin_price": {
+      "type": "number",
+      "default": 0
+    },
+    "read_count": {
+      "type": "number",
+      "default": 0
+    },
+    "like_count": {
+      "type": "number",
+      "default": 0
+    },
+    "chapter_count": {
+      "type": "number",
+      "default": 0
+    },
+    "language": {
+      "type": "string",
+      "default": "en"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

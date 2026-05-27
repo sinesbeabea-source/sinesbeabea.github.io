@@ -1,0 +1,40 @@
+{
+  "name": "ChatRoom",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "direct",
+        "group"
+      ],
+      "default": "direct"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Member emails"
+    },
+    "cover_url": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "genre_focus": {
+      "type": "string"
+    },
+    "last_message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "members"
+  ]
+}

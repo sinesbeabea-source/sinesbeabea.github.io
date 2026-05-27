@@ -1,0 +1,229 @@
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/lib/AuthContext';
+import { motion } from 'framer-motion';
+import { Star, BookOpen, Clock, Eye, Heart, Share2, ChevronRight, MessageSquare, Loader2, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import GlassCard from '@/components/ui/GlassCard';
+
+export default function BookDetail() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
+  const { data: book, isLoading } = useQuery({
+    queryKey: ['book', id],
+    queryFn: () => base44.entities.Book.filter({ id }),
+    select: (data) => data[0],
+  });
+
+  const { data: chapters } = useQuery({
+    queryKey: ['chapters', id],
+    queryFn: () => base44.entities.Chapter.filter({ book_id: id, status: 'published' }, 'chapter_number', 100),
+    initialData: [],
+  });
+
+  const { data: reviews } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => base44.entities.Review.filter({ book_id: id }, '-created_date', 20),
+    initialData: [],
+  });
+
+  const { data: myProgress } = useQuery({
+    queryKey: ['my-progress', id],
+    queryFn: async () => {
+      const progs = await base44.entities.ReadingProgress.filter({ book_id: id, created_by: user?.email });
+      return progs[0] || null;
+    },
+    enabled: !!user,
+  });
+
+  const addToLibrary = useMutation({
+    mutationFn: (status) => {
+      if (myProgress) {
+        return base44.entities.ReadingProgress.update(myProgress.id, { status });
+      }
+      return base44.entities.ReadingProgress.create({ book_id: id, status });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['my-progress', id] }),
+  });
+
+  const submitReview = useMutation({
+    mutationFn: () => base44.entities.Review.create({ book_id: id, rating: reviewRating, content: reviewText }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] });
+      setReviewText('');
+      setShowReviewForm(false);
+    },
+  });
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  }
+
+  if (!book) {
+    return <div className="flex items-center justify-center min-h-screen"><p className="text-muted-foreground">Book not found</p></div>;
+  }
+
+  const placeholderCover = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop';
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero */}
+      <div className="relative">
+        <div className="absolute inset-0 h-80">
+          <img src={book.cover_url || placeholderCover} alt="" className="w-full h-full object-cover opacity-20 blur-2xl" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background" />
+        </div>
+        
+        <div className="relative max-w-5xl mx-auto px-4 pt-8 pb-12">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row gap-8">
+            {/* Cover */}
+            <div className="shrink-0">
+              <div className="w-48 md:w-56 aspect-[2/3] rounded-2xl overflow-hidden neon-glow mx-auto md:mx-0">
+                <img src={book.cover_url || placeholderCover} alt={book.title} className="w-full h-full object-cover" />
+              </div>
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl font-space font-bold mb-2">{book.title}</h1>
+              <p className="text-lg text-muted-foreground mb-4">{book.author || 'Unknown Author'}</p>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-6">
+                {book.rating > 0 && (
+                  <div className="flex items-center gap-1">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} className={`w-4 h-4 ${s <= Math.round(book.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}`} />
+                    ))}
+                    <span className="text-sm ml-1">{book.rating?.toFixed(1)} ({book.rating_count || 0})</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <Eye className="w-4 h-4" /> {book.read_count || 0} reads
+                </div>
+                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <BookOpen className="w-4 h-4" /> {chapters.length} chapters
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-6 justify-center md:justify-start">
+                {book.genres?.map(g => <Badge key={g} variant="outline" className="border-primary/30 text-primary">{g}</Badge>)}
+                {book.mood && <Badge className="bg-accent/20 text-accent">{book.mood}</Badge>}
+                {book.tags?.slice(0, 4).map(t => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
+              </div>
+
+              <p className="text-muted-foreground mb-6 max-w-2xl">{book.description}</p>
+
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                {chapters.length > 0 && (
+                  <Link to={`/read/${id}/${chapters[0]?.id}`}>
+                    <Button size="lg" className="bg-gradient-to-r from-primary to-accent rounded-full gap-2 px-8">
+                      <BookOpen className="w-4 h-4" /> {myProgress?.status === 'reading' ? 'Continue Reading' : 'Start Reading'}
+                    </Button>
+                  </Link>
+                )}
+                <Select value={myProgress?.status || ''} onValueChange={(v) => addToLibrary.mutate(v)}>
+                  <SelectTrigger className="w-44 rounded-full">
+                    <SelectValue placeholder="+ Add to Library" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="want_to_read">Want to Read</SelectItem>
+                    <SelectItem value="reading">Currently Reading</SelectItem>
+                    <SelectItem value="finished">Finished</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {myProgress && (
+                <div className="mt-4 max-w-xs">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                    <span>Progress</span>
+                    <span>{myProgress.progress_percent || 0}%</span>
+                  </div>
+                  <Progress value={myProgress.progress_percent || 0} className="h-1.5" />
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Chapters & Reviews */}
+      <div className="max-w-5xl mx-auto px-4 pb-16">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Chapters */}
+          <div className="md:col-span-2">
+            <h2 className="text-xl font-space font-bold mb-4">Chapters</h2>
+            <div className="space-y-2">
+              {chapters.map((ch, i) => (
+                <Link key={ch.id} to={`/read/${id}/${ch.id}`}>
+                  <GlassCard className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-8">#{ch.chapter_number || i + 1}</span>
+                      <span className="text-sm font-medium">{ch.title}</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </GlassCard>
+                </Link>
+              ))}
+              {chapters.length === 0 && <p className="text-muted-foreground text-sm">No chapters published yet</p>}
+            </div>
+          </div>
+
+          {/* Reviews */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-space font-bold">Reviews</h2>
+              <Button variant="ghost" size="sm" onClick={() => setShowReviewForm(!showReviewForm)}>
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {showReviewForm && (
+              <GlassCard hover={false} className="mb-4 p-4">
+                <div className="flex gap-1 mb-3">
+                  {[1,2,3,4,5].map(s => (
+                    <Star
+                      key={s}
+                      onClick={() => setReviewRating(s)}
+                      className={`w-5 h-5 cursor-pointer ${s <= reviewRating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}`}
+                    />
+                  ))}
+                </div>
+                <Textarea value={reviewText} onChange={e => setReviewText(e.target.value)} placeholder="Write your review..." className="mb-3" />
+                <Button size="sm" onClick={() => submitReview.mutate()} disabled={submitReview.isPending}>
+                  {submitReview.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
+                </Button>
+              </GlassCard>
+            )}
+
+            <div className="space-y-3">
+              {reviews.map(r => (
+                <GlassCard key={r.id} hover={false} className="p-3">
+                  <div className="flex items-center gap-1 mb-2">
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} className={`w-3 h-3 ${s <= r.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}`} />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground">{r.content}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{r.created_by}</p>
+                </GlassCard>
+              ))}
+              {reviews.length === 0 && <p className="text-sm text-muted-foreground">No reviews yet</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

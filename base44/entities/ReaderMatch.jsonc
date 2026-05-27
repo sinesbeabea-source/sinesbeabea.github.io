@@ -1,0 +1,47 @@
+{
+  "name": "ReaderMatch",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "matched_email": {
+      "type": "string"
+    },
+    "match_percent": {
+      "type": "number"
+    },
+    "shared_genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "shared_books": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "personality_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "accepted",
+        "rejected",
+        "skipped"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "user_email",
+    "matched_email"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "book_id": {
+      "type": "string",
+      "description": "Reference to book"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Rating 1-5"
+    },
+    "content": {
+      "type": "string",
+      "description": "Review text"
+    },
+    "like_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "book_id",
+    "rating"
+  ]
+}

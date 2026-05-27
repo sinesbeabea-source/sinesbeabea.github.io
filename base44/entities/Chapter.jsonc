@@ -1,0 +1,47 @@
+{
+  "name": "Chapter",
+  "type": "object",
+  "properties": {
+    "book_id": {
+      "type": "string",
+      "description": "Reference to book"
+    },
+    "title": {
+      "type": "string",
+      "description": "Chapter title"
+    },
+    "content": {
+      "type": "string",
+      "description": "Chapter content (HTML)"
+    },
+    "chapter_number": {
+      "type": "number",
+      "description": "Chapter order"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "unpublished"
+      ],
+      "default": "draft"
+    },
+    "is_premium": {
+      "type": "boolean",
+      "default": false
+    },
+    "coin_price": {
+      "type": "number",
+      "default": 0
+    },
+    "word_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "book_id",
+    "title"
+  ]
+}
