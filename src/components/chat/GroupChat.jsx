@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MessageCircle, Send, Plus, Users, Hash, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Send, Plus, Users, Hash, ArrowLeft, Trash2, LogOut } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ export default function GroupChat() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [message, setMessage] = useState('');
   const [newRoomName, setNewRoomName] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const messagesEndRef = useRef(null);
 
   const { data: myRooms } = useQuery({
@@ -67,6 +68,26 @@ export default function GroupChat() {
     onSuccess: () => { setNewRoomName(''); queryClient.invalidateQueries({ queryKey: ['chat-rooms'] }); },
   });
 
+  // Leave room (remove self from members)
+  const leaveRoom = useMutation({
+    mutationFn: async (room) => {
+      const newMembers = (room.members || []).filter(m => m !== user?.email);
+      if (newMembers.length === 0) {
+        // Delete room and its messages if no members left
+        const msgs = await base44.entities.ChatMessage.filter({ room_id: room.id });
+        for (const m of msgs) await base44.entities.ChatMessage.delete(m.id);
+        await base44.entities.ChatRoom.delete(room.id);
+      } else {
+        await base44.entities.ChatRoom.update(room.id, { members: newMembers });
+      }
+    },
+    onSuccess: () => {
+      setConfirmDeleteId(null);
+      if (selectedRoom?.id === confirmDeleteId) setSelectedRoom(null);
+      queryClient.invalidateQueries({ queryKey: ['chat-rooms'] });
+    },
+  });
+
   const joinRoom = async (room) => {
     if (!room.members?.includes(user?.email)) {
       await base44.entities.ChatRoom.update(room.id, { members: [...(room.members || []), user?.email] });
@@ -74,6 +95,8 @@ export default function GroupChat() {
     }
     setSelectedRoom(room);
   };
+
+  const roomToDelete = myRooms.find(r => r.id === confirmDeleteId);
 
   return (
     <div className="h-full flex">
@@ -99,25 +122,64 @@ export default function GroupChat() {
               <p className="text-sm text-muted-foreground text-center py-8">ยังไม่มีห้องแชท สร้างเลย!</p>
             )}
             {myRooms.map(room => (
-              <button
-                key={room.id}
-                onClick={() => joinRoom(room)}
-                className={`w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 ${
-                  selectedRoom?.id === room.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                }`}
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center shrink-0">
-                  {room.type === 'group' ? <Users className="w-4 h-4" /> : <Hash className="w-4 h-4" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{room.name}</p>
-                  {room.last_message && <p className="text-xs text-muted-foreground truncate">{room.last_message}</p>}
-                </div>
-              </button>
+              <div key={room.id} className="relative group">
+                <button
+                  onClick={() => joinRoom(room)}
+                  className={`w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 pr-10 ${
+                    selectedRoom?.id === room.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                  }`}
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center shrink-0">
+                    {room.type === 'group' ? <Users className="w-4 h-4" /> : <Hash className="w-4 h-4" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{room.name}</p>
+                    {room.last_message && <p className="text-xs text-muted-foreground truncate">{room.last_message}</p>}
+                  </div>
+                </button>
+                {/* Delete/Leave button */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); setConfirmDeleteId(room.id); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                  title="ออกจากห้อง"
+                >
+                  {room.created_by === user?.email ? <Trash2 className="w-3.5 h-3.5" /> : <LogOut className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             ))}
           </div>
         </ScrollArea>
       </div>
+
+      {/* Confirm delete dialog */}
+      {confirmDeleteId && roomToDelete && (
+        <div className="fixed inset-0 z-50 bg-background/60 backdrop-blur-sm flex items-center justify-center px-4"
+          onClick={() => setConfirmDeleteId(null)}>
+          <div className="glass rounded-2xl p-6 max-w-sm w-full border border-border/50 shadow-xl"
+            onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold mb-1">
+              {roomToDelete.created_by === user?.email ? 'ลบห้องแชท?' : 'ออกจากห้องแชท?'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {roomToDelete.created_by === user?.email
+                ? `ห้อง "${roomToDelete.name}" และข้อความทั้งหมดจะถูกลบถาวร`
+                : `คุณจะออกจากห้อง "${roomToDelete.name}"`}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="destructive" className="flex-1 rounded-full"
+                onClick={() => leaveRoom.mutate(roomToDelete)}
+                disabled={leaveRoom.isPending}
+              >
+                {leaveRoom.isPending ? 'กำลังดำเนินการ...' : roomToDelete.created_by === user?.email ? 'ลบห้อง' : 'ออกจากห้อง'}
+              </Button>
+              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setConfirmDeleteId(null)}>
+                ยกเลิก
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chat Area */}
       <div className={`flex-1 flex flex-col ${!selectedRoom ? 'hidden md:flex' : 'flex'}`}>
@@ -130,10 +192,18 @@ export default function GroupChat() {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center">
                 <Users className="w-3.5 h-3.5" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-medium text-sm">{selectedRoom.name}</p>
                 <p className="text-xs text-muted-foreground">{selectedRoom.members?.length} สมาชิก</p>
               </div>
+              <Button
+                size="sm" variant="ghost"
+                onClick={() => setConfirmDeleteId(selectedRoom.id)}
+                className="text-muted-foreground hover:text-destructive gap-1.5 text-xs rounded-full"
+              >
+                {selectedRoom.created_by === user?.email ? <Trash2 className="w-3.5 h-3.5" /> : <LogOut className="w-3.5 h-3.5" />}
+                {selectedRoom.created_by === user?.email ? 'ลบ' : 'ออก'}
+              </Button>
             </div>
 
             <ScrollArea className="flex-1 p-4">

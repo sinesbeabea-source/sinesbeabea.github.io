@@ -3,11 +3,10 @@ import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Send, BookOpen, Sparkles, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Heart, Send, BookOpen, Sparkles, ArrowLeft, MessageCircle, X, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import GlassCard from '@/components/ui/GlassCard';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
@@ -24,6 +23,7 @@ export default function MatchChat() {
   const queryClient = useQueryClient();
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [message, setMessage] = useState('');
+  const [confirmEnd, setConfirmEnd] = useState(false);
   const messagesEndRef = useRef(null);
 
   const { data: myMatches } = useQuery({
@@ -31,15 +31,36 @@ export default function MatchChat() {
     queryFn: () => base44.entities.ReaderMatch.filter({ user_email: user?.email, status: 'accepted' }, '-created_date', 30),
     enabled: !!user,
     initialData: [],
+    refetchInterval: 8000,
   });
 
-  // Get or create chat room for this match
+  // Auto-select first match if none selected
+  useEffect(() => {
+    if (myMatches.length > 0 && !selectedMatch) {
+      setSelectedMatch(myMatches[0]);
+    }
+  }, [myMatches]);
+
+  // Sync: if currently selected match gets ended by buddy, clear it
+  useEffect(() => {
+    if (!selectedMatch) return;
+    const updated = myMatches.find(m => m.id === selectedMatch.id);
+    if (updated && updated.status !== 'accepted') {
+      setSelectedMatch(null);
+    }
+  }, [myMatches, selectedMatch?.id]);
+
+  // Get or create chat room for selected match
   const { data: chatRooms } = useQuery({
     queryKey: ['match-rooms', selectedMatch?.id],
     queryFn: async () => {
-      const roomName = `match:${[user?.email, selectedMatch.matched_email].sort().join(':')}`;
+      // Use the same room name convention as the popup so messages are synced
+      const roomName = `reading:${[user?.email, selectedMatch.matched_email].sort().join(':')}`;
       let rooms = await base44.entities.ChatRoom.filter({ name: roomName });
       if (rooms.length === 0) {
+        // Fallback to old match: prefix
+        const oldRooms = await base44.entities.ChatRoom.filter({ name: `match:${[user?.email, selectedMatch.matched_email].sort().join(':')}` });
+        if (oldRooms.length > 0) return oldRooms;
         const room = await base44.entities.ChatRoom.create({
           name: roomName,
           type: 'direct',
@@ -88,6 +109,32 @@ export default function MatchChat() {
     sendMessage.mutate(message.trim());
   };
 
+  // End match for both sides
+  const handleEndMatch = async () => {
+    const now = new Date().toISOString();
+    await base44.entities.ReaderMatch.update(selectedMatch.id, { status: 'ended', ended_at: now });
+    // Also end buddy's side
+    const reverse = await base44.entities.ReaderMatch.filter({
+      user_email: selectedMatch.matched_email,
+      matched_email: user?.email,
+    });
+    for (const r of reverse) {
+      if (r.status !== 'ended') {
+        await base44.entities.ReaderMatch.update(r.id, { status: 'ended', ended_at: now });
+      }
+    }
+    await base44.entities.Notification.create({
+      user_email: selectedMatch.matched_email,
+      type: 'system',
+      title: 'การแมทช์สิ้นสุดแล้ว',
+      message: `${user?.full_name || user?.email?.split('@')[0]} จบการสนทนาแล้ว`,
+      from_user: user?.email,
+    });
+    setConfirmEnd(false);
+    setSelectedMatch(null);
+    queryClient.invalidateQueries({ queryKey: ['match-chat-list', user?.email] });
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Match list sidebar */}
@@ -124,10 +171,10 @@ export default function MatchChat() {
                   <span className="text-sm font-bold text-white">{m.matched_email?.[0]?.toUpperCase()}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{m.matched_email}</p>
+                  <p className="text-sm font-medium truncate">{m.matched_email?.split('@')[0]}</p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
-                    <span className="text-xs text-muted-foreground">{m.match_percent}% ความเข้ากัน</span>
+                    <span className="text-xs text-muted-foreground">{m.match_percent || '—'}% ความเข้ากัน</span>
                   </div>
                 </div>
               </button>
@@ -152,12 +199,12 @@ export default function MatchChat() {
               <button className="md:hidden text-muted-foreground" onClick={() => setSelectedMatch(null)}>
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-primary flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-rose-500 to-primary flex items-center justify-center shrink-0">
                 <span className="text-sm font-bold text-white">{selectedMatch.matched_email?.[0]?.toUpperCase()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{selectedMatch.matched_email}</p>
-                <div className="flex gap-1">
+                <p className="font-medium truncate">{selectedMatch.matched_email?.split('@')[0]}</p>
+                <div className="flex gap-1 flex-wrap">
                   {selectedMatch.shared_genres?.slice(0, 2).map(g => (
                     <Badge key={g} variant="secondary" className="text-[10px]">{g}</Badge>
                   ))}
@@ -165,11 +212,40 @@ export default function MatchChat() {
               </div>
               <Badge className="bg-rose-500/10 text-rose-400 border-rose-500/20">
                 <Heart className="w-3 h-3 fill-rose-400 mr-1" />
-                {selectedMatch.match_percent}%
+                {selectedMatch.match_percent || '—'}%
               </Badge>
+              {/* End match button */}
+              <Button
+                size="sm" variant="ghost"
+                onClick={() => setConfirmEnd(true)}
+                className="text-xs text-muted-foreground hover:text-destructive gap-1 rounded-full ml-1"
+              >
+                <PhoneOff className="w-3.5 h-3.5" /> จบแชท
+              </Button>
             </div>
 
-            {/* Conversation starters (if no messages) */}
+            {/* Confirm end dialog */}
+            <AnimatePresence>
+              {confirmEnd && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                  className="mx-4 mt-3 p-4 glass rounded-xl border border-destructive/30 flex items-center gap-3"
+                >
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">จบการแมทช์นี้?</p>
+                    <p className="text-xs text-muted-foreground">ทั้งสองฝ่ายจะไม่เห็นห้องแชทนี้อีก</p>
+                  </div>
+                  <Button size="sm" variant="destructive" onClick={handleEndMatch} className="text-xs rounded-full">
+                    จบเลย
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmEnd(false)} className="text-xs rounded-full">
+                    <X className="w-3 h-3" />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Conversation starters */}
             {messages.length === 0 && (
               <div className="p-4">
                 <p className="text-xs text-muted-foreground mb-3 text-center">เริ่มต้นด้วยคำถามเหล่านี้</p>
@@ -178,7 +254,8 @@ export default function MatchChat() {
                     <button
                       key={i}
                       onClick={() => sendMessage.mutate(s)}
-                      className="text-xs px-3 py-1.5 rounded-full border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground"
+                      disabled={!chatRoom}
+                      className="text-xs px-3 py-1.5 rounded-full border border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50"
                     >
                       {s}
                     </button>
@@ -218,7 +295,7 @@ export default function MatchChat() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Shared books section */}
+            {/* Shared genres */}
             {selectedMatch.shared_genres?.length > 0 && (
               <div className="px-4 pb-2">
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-primary/5 border border-primary/20">
@@ -241,12 +318,13 @@ export default function MatchChat() {
                 placeholder="พิมพ์ข้อความ..."
                 className="flex-1"
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                disabled={!chatRoom}
               />
               <Button
                 size="icon"
                 className="bg-gradient-to-r from-primary to-accent shrink-0"
                 onClick={handleSend}
-                disabled={!message.trim() || sendMessage.isPending}
+                disabled={!message.trim() || sendMessage.isPending || !chatRoom}
               >
                 <Send className="w-4 h-4" />
               </Button>
