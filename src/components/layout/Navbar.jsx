@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -6,14 +6,25 @@ import {
   Sparkles, Home, Users, PenTool, Library, ScanLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import GlobalSearch from '@/components/search/GlobalSearch';
 
 export default function Navbar({ user, notificationCount = 0 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSearchOpen(false);
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const navItems = [
     { path: '/', icon: Home, label: 'หน้าหลัก' },
@@ -22,14 +33,6 @@ export default function Navbar({ user, notificationCount = 0 }) {
     { path: '/matching', icon: Users, label: 'จับคู่' },
     { path: '/community', icon: BookOpen, label: 'ชุมชน' },
   ];
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      window.location.href = `/discover?q=${encodeURIComponent(searchQuery)}`;
-      setSearchOpen(false);
-    }
-  };
 
   return (
     <>
@@ -126,39 +129,8 @@ export default function Navbar({ user, notificationCount = 0 }) {
         </AnimatePresence>
       </nav>
 
-      {/* Search Overlay */}
       <AnimatePresence>
-        {searchOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-xl flex items-start justify-center pt-24"
-            onClick={() => setSearchOpen(false)}
-          >
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="w-full max-w-xl mx-4"
-              onClick={e => e.stopPropagation()}
-            >
-              <form onSubmit={handleSearch}>
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    autoFocus
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="ค้นหาหนังสือ นักเขียน แนว... ลองพิมพ์ 'แฟนตาซีมืด ตัวเอกฉลาด'"
-                    className="pl-12 pr-4 h-14 text-lg glass rounded-2xl border-primary/30 focus:border-primary"
-                  />
-                </div>
-              </form>
-              <p className="text-xs text-muted-foreground mt-3 text-center">ค้นหาด้วย AI ภาษาธรรมชาติ</p>
-            </motion.div>
-          </motion.div>
-        )}
+        <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       </AnimatePresence>
     </>
   );
