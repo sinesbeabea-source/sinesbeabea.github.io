@@ -38,6 +38,7 @@ import ManageUsers from '@/pages/admin/ManageUsers';
 import ManageBooks from '@/pages/admin/ManageBooks';
 import Trash from '@/pages/Trash';
 import MatchChat from '@/pages/MatchChat';
+import CoinShop from '@/pages/CoinShop';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -96,6 +97,7 @@ const AuthenticatedApp = () => {
           {/* New features */}
           <Route path="/trash" element={<Trash />} />
           <Route path="/match-chat" element={<MatchChat />} />
+          <Route path="/coin-shop" element={<CoinShop />} />
         </Route>
 
         {/* Reader - no layout for immersive experience */}

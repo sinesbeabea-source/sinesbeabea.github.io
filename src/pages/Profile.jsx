@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet } from 'lucide-react';
+import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import GlassCard from '@/components/ui/GlassCard';
@@ -126,6 +126,7 @@ export default function Profile() {
             { label: 'ตั้งค่า', path: '/settings', icon: Settings },
             { label: 'แมทช์แชท', path: '/match-chat', icon: Users },
             { label: 'ถังขยะ', path: '/trash', icon: Trash2 },
+            { label: 'เติมเหรียญ', path: '/coin-shop', icon: Coins },
           ].map(link => (
             <Link key={link.path} to={link.path}>
               <GlassCard className="p-4 text-center">
