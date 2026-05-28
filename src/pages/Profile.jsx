@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet, Coins, AtSign } from 'lucide-react';
+import { User, BookOpen, PenTool, Settings, LogOut, Library, Users, Camera, Trash2, Wallet, Coins, AtSign, RefreshCw } from 'lucide-react';
 import UsernameSetup from '@/components/profile/UsernameSetup';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +16,7 @@ import AvatarEditor, { AvatarDisplay } from '@/components/profile/AvatarEditor';
 import DeleteBookModal from '@/components/books/DeleteBookModal';
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, checkUserAuth } = useAuth();
   const [showAvatarEditor, setShowAvatarEditor] = useState(false);
   const [showWallet, setShowWallet] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
@@ -187,7 +187,7 @@ export default function Profile() {
 
       {/* Username Setup */}
       {showUsernameSetup && (
-        <UsernameSetup onDone={() => { setShowUsernameSetup(false); window.location.reload(); }} />
+        <UsernameSetup onDone={async () => { await checkUserAuth(); setShowUsernameSetup(false); }} />
       )}
 
       {/* Avatar Editor Dialog */}
