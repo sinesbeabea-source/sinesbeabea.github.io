@@ -306,7 +306,13 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
   const handleEndChat = async () => {
     const now = new Date().toISOString();
     if (matchId) {
-      await base44.entities.ReaderMatch.update(matchId, { status: 'ended', ended_at: now });
+      await base44.entities.ReaderMatch.update(matchId, {
+        status: 'ended',
+        ended_at: now,
+        popup_opened: false,
+        sync_active: false,
+        call_status: 'idle',
+      });
     }
     const reverse = await base44.entities.ReaderMatch.filter({
       user_email: buddyEmail,
@@ -314,7 +320,13 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     });
     for (const r of reverse) {
       if (r.status !== 'ended') {
-        await base44.entities.ReaderMatch.update(r.id, { status: 'ended', ended_at: now });
+        await base44.entities.ReaderMatch.update(r.id, {
+          status: 'ended',
+          ended_at: now,
+          popup_opened: false,
+          sync_active: false,
+          call_status: 'idle',
+        });
       }
     }
     setConfirmEnd(false);

@@ -32,7 +32,7 @@ export default function GlobalMatchWatcher() {
       try {
         const current = chatPopupRef.current;
 
-        // 1) If we have an active match, watch if buddy ended it
+        // 1) If we have an active match (full or minimized), watch if buddy ended it
         if (current) {
           const matches = await base44.entities.ReaderMatch.filter({
             user_email: user.email,
@@ -43,7 +43,7 @@ export default function GlobalMatchWatcher() {
             setChatPopup(null);
             setMinimized(false);
           }
-          return;
+          return; // don't look for new matches while one is active
         }
 
         // 2) Look for newly accepted match not yet shown as popup
@@ -61,6 +61,24 @@ export default function GlobalMatchWatcher() {
             bookTitle: m.book_title,
           });
           setMinimized(false);
+          return;
+        }
+
+        // 3) Also re-open if there's an accepted+popup_opened match that we lost track of
+        //    (e.g. page refresh while popup was open)
+        const openMatch = await base44.entities.ReaderMatch.filter({
+          user_email: user.email,
+          status: 'accepted',
+          popup_opened: true,
+        });
+        if (openMatch.length > 0) {
+          const m = openMatch[0];
+          setChatPopup({
+            matchId: m.id,
+            buddyEmail: m.matched_email,
+            bookTitle: m.book_title,
+          });
+          setMinimized(true); // restore minimized so it doesn't jump in their face
         }
       } finally {
         processingRef.current = false;
