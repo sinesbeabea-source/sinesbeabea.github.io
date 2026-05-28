@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, X, Heart, UserPlus, UserCheck, ArrowRight,
-  Phone, PhoneOff, BookOpen, ChevronRight
+  Phone, PhoneOff, BookOpen, ChevronRight, ChevronDown
 } from 'lucide-react';
 import VoiceCall from '@/components/voice/VoiceCall';
 import { Button } from '@/components/ui/button';
@@ -392,9 +392,9 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
               className="text-xs text-muted-foreground hover:text-destructive gap-1 rounded-full">
               <PhoneOff className="w-3 h-3" /> จบแชท
             </Button>
-            {/* Minimize (just closes popup, chat still alive) */}
-            <Button size="icon" variant="ghost" onClick={onClose} title="ย่อ" className="h-7 w-7">
-              <X className="w-4 h-4" />
+            {/* Minimize — shrinks to floating bubble, chat stays alive */}
+            <Button size="icon" variant="ghost" onClick={onClose} title="ย่อลง" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+              <ChevronDown className="w-4 h-4" />
             </Button>
           </div>
         </div>
