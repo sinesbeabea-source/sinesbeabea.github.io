@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import useIdleLogout from '@/hooks/useIdleLogout';
 
 const AuthContext = createContext();
 
@@ -126,6 +127,9 @@ export const AuthProvider = ({ children }) => {
       base44.auth.logout();
     }
   };
+
+  // Auto-logout after 10 minutes of inactivity
+  useIdleLogout(isAuthenticated, logout);
 
   const navigateToLogin = () => {
     // Use the SDK's redirectToLogin method
