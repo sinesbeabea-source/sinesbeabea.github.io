@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700&family=Sarabun:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,77 +6,78 @@
 
 @layer base {
   :root {
-    --font-inter: 'Sarabun', 'Inter', sans-serif;
-    --font-space: 'Sarabun', 'Space Grotesk', sans-serif;
+    --font-inter: 'Nunito', 'Sarabun', sans-serif;
+    --font-space: 'Nunito', 'Sarabun', sans-serif;
 
-    --background: 230 25% 7%;
-    --foreground: 220 20% 95%;
-    --card: 230 25% 10%;
-    --card-foreground: 220 20% 95%;
-    --popover: 230 25% 10%;
-    --popover-foreground: 220 20% 95%;
-    --primary: 250 90% 65%;
+    /* Kawaii Dark Cute — navy base, pink + mint accents */
+    --background: 240 35% 10%;
+    --foreground: 300 20% 95%;
+    --card: 240 30% 14%;
+    --card-foreground: 300 20% 95%;
+    --popover: 240 30% 14%;
+    --popover-foreground: 300 20% 95%;
+    --primary: 330 100% 72%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 230 25% 15%;
-    --secondary-foreground: 220 20% 90%;
-    --muted: 230 20% 14%;
-    --muted-foreground: 220 15% 55%;
-    --accent: 195 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 55%;
+    --secondary: 240 28% 20%;
+    --secondary-foreground: 300 20% 88%;
+    --muted: 240 25% 18%;
+    --muted-foreground: 260 15% 58%;
+    --accent: 160 80% 60%;
+    --accent-foreground: 240 35% 10%;
+    --destructive: 0 72% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 230 20% 18%;
-    --input: 230 20% 18%;
-    --ring: 250 90% 65%;
-    --chart-1: 250 90% 65%;
-    --chart-2: 195 100% 50%;
-    --chart-3: 280 80% 60%;
-    --chart-4: 330 80% 60%;
-    --chart-5: 160 70% 50%;
-    --radius: 0.75rem;
-    --sidebar-background: 230 25% 8%;
-    --sidebar-foreground: 220 20% 90%;
-    --sidebar-primary: 250 90% 65%;
+    --border: 255 25% 22%;
+    --input: 255 25% 22%;
+    --ring: 330 100% 72%;
+    --chart-1: 330 100% 72%;
+    --chart-2: 160 80% 60%;
+    --chart-3: 280 80% 70%;
+    --chart-4: 200 100% 65%;
+    --chart-5: 50 100% 65%;
+    --radius: 1rem;
+    --sidebar-background: 240 35% 8%;
+    --sidebar-foreground: 300 20% 90%;
+    --sidebar-primary: 330 100% 72%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 25% 14%;
-    --sidebar-accent-foreground: 220 20% 90%;
-    --sidebar-border: 230 20% 18%;
-    --sidebar-ring: 250 90% 65%;
+    --sidebar-accent: 240 30% 16%;
+    --sidebar-accent-foreground: 300 20% 88%;
+    --sidebar-border: 255 25% 20%;
+    --sidebar-ring: 330 100% 72%;
   }
 
   .dark {
-    --background: 230 25% 7%;
-    --foreground: 220 20% 95%;
-    --card: 230 25% 10%;
-    --card-foreground: 220 20% 95%;
-    --popover: 230 25% 10%;
-    --popover-foreground: 220 20% 95%;
-    --primary: 250 90% 65%;
+    --background: 240 35% 10%;
+    --foreground: 300 20% 95%;
+    --card: 240 30% 14%;
+    --card-foreground: 300 20% 95%;
+    --popover: 240 30% 14%;
+    --popover-foreground: 300 20% 95%;
+    --primary: 330 100% 72%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 230 25% 15%;
-    --secondary-foreground: 220 20% 90%;
-    --muted: 230 20% 14%;
-    --muted-foreground: 220 15% 55%;
-    --accent: 195 100% 50%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 55%;
+    --secondary: 240 28% 20%;
+    --secondary-foreground: 300 20% 88%;
+    --muted: 240 25% 18%;
+    --muted-foreground: 260 15% 58%;
+    --accent: 160 80% 60%;
+    --accent-foreground: 240 35% 10%;
+    --destructive: 0 72% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 230 20% 18%;
-    --input: 230 20% 18%;
-    --ring: 250 90% 65%;
-    --chart-1: 250 90% 65%;
-    --chart-2: 195 100% 50%;
-    --chart-3: 280 80% 60%;
-    --chart-4: 330 80% 60%;
-    --chart-5: 160 70% 50%;
-    --sidebar-background: 230 25% 8%;
-    --sidebar-foreground: 220 20% 90%;
-    --sidebar-primary: 250 90% 65%;
+    --border: 255 25% 22%;
+    --input: 255 25% 22%;
+    --ring: 330 100% 72%;
+    --chart-1: 330 100% 72%;
+    --chart-2: 160 80% 60%;
+    --chart-3: 280 80% 70%;
+    --chart-4: 200 100% 65%;
+    --chart-5: 50 100% 65%;
+    --sidebar-background: 240 35% 8%;
+    --sidebar-foreground: 300 20% 90%;
+    --sidebar-primary: 330 100% 72%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 230 25% 14%;
-    --sidebar-accent-foreground: 220 20% 90%;
-    --sidebar-border: 230 20% 18%;
-    --sidebar-ring: 250 90% 65%;
+    --sidebar-accent: 240 30% 16%;
+    --sidebar-accent-foreground: 300 20% 88%;
+    --sidebar-border: 255 25% 20%;
+    --sidebar-ring: 330 100% 72%;
   }
 }
 
@@ -91,22 +92,37 @@
 
 @layer utilities {
   .glass {
-    @apply bg-card/60 backdrop-blur-xl border border-border/50;
+    @apply bg-card/70 backdrop-blur-xl border border-border/60;
+    border-radius: var(--radius);
   }
   .glass-hover {
-    @apply hover:bg-card/80 hover:border-primary/30 transition-all duration-300;
+    @apply hover:bg-card/90 hover:border-primary/40 transition-all duration-300;
   }
   .neon-glow {
-    box-shadow: 0 0 20px hsl(250 90% 65% / 0.15), 0 0 40px hsl(250 90% 65% / 0.05);
+    box-shadow: 0 0 24px hsl(330 100% 72% / 0.25), 0 0 48px hsl(330 100% 72% / 0.08), 0 4px 24px hsl(240 35% 5% / 0.6);
   }
   .neon-glow-accent {
-    box-shadow: 0 0 20px hsl(195 100% 50% / 0.15), 0 0 40px hsl(195 100% 50% / 0.05);
+    box-shadow: 0 0 24px hsl(160 80% 60% / 0.25), 0 0 48px hsl(160 80% 60% / 0.08);
   }
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
   .gradient-border {
-    border-image: linear-gradient(to right, hsl(250 90% 65%), hsl(195 100% 50%)) 1;
+    border-image: linear-gradient(to right, hsl(330 100% 72%), hsl(160 80% 60%)) 1;
+  }
+  .kawaii-btn {
+    @apply rounded-full font-bold transition-all duration-200 active:scale-95;
+    background: linear-gradient(135deg, #FF85C2, #85FFD4);
+    color: #1a1033;
+    box-shadow: 0 4px 16px hsl(330 100% 72% / 0.35);
+  }
+  .kawaii-btn:hover {
+    box-shadow: 0 6px 24px hsl(330 100% 72% / 0.5);
+    transform: translateY(-1px);
+  }
+  .card-cute {
+    @apply bg-card/80 backdrop-blur-xl border border-primary/20 rounded-2xl;
+    box-shadow: 0 4px 32px hsl(240 35% 5% / 0.5), inset 0 1px 0 hsl(330 100% 72% / 0.08);
   }
 }
 
@@ -115,12 +131,29 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(230 25% 7%);
+  background: hsl(240 35% 10%);
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(230 20% 20%);
-  border-radius: 3px;
+  background: hsl(330 100% 72% / 0.35);
+  border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(250 90% 65% / 0.5);
+  background: hsl(330 100% 72% / 0.6);
+}
+
+/* Kawaii bounce animation */
+@keyframes kawaii-bounce {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-6px) rotate(-3deg); }
+  75% { transform: translateY(-3px) rotate(3deg); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+.kawaii-bounce {
+  animation: kawaii-bounce 3s ease-in-out infinite;
+}
+.sparkle {
+  animation: sparkle 2s ease-in-out infinite;
 }

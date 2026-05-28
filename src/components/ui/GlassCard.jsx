@@ -5,10 +5,11 @@ import { cn } from '@/lib/utils';
 export default function GlassCard({ children, className, hover = true, glow = false, ...props }) {
   return (
     <motion.div
-      whileHover={hover ? { y: -2, scale: 1.01 } : undefined}
-      transition={{ duration: 0.2 }}
+      whileHover={hover ? { y: -3, scale: 1.02 } : undefined}
+      whileTap={hover ? { scale: 0.98 } : undefined}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
-        'glass rounded-xl p-4',
+        'glass rounded-2xl p-4',
         hover && 'glass-hover cursor-pointer',
         glow && 'neon-glow',
         className
