@@ -47,6 +47,15 @@ export default function EbookReader() {
   const isPurchased = purchasedChapters.some(p => p.chapter_id === chapterId);
   const isLocked = chapter?.is_premium && !isOwner && !isPurchased;
 
+  // Increment read_count once per chapter open
+  useEffect(() => {
+    if (!bookId || isLocked) return;
+    // Fetch fresh to avoid stale count
+    base44.entities.Book.filter({ id: bookId }).then(([b]) => {
+      if (b) base44.entities.Book.update(bookId, { read_count: (b.read_count || 0) + 1 });
+    });
+  }, [chapterId]);
+
   const currentIndex = chapters.findIndex(c => c.id === chapterId);
   const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
   const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
@@ -171,7 +180,7 @@ export default function EbookReader() {
             <p className="text-muted-foreground mb-6">บทนี้เป็นบทพรีเมียม กรุณาซื้อเพื่ออ่าน</p>
             <div className="flex items-center gap-2 mb-8 px-6 py-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
               <Coins className="w-5 h-5 text-yellow-400" />
-              <span className="font-bold">ราคา: 10 เหรียญ</span>
+              <span className="font-bold">ราคา: {chapter?.coin_price || 10} เหรียญ</span>
             </div>
             <Button
               size="lg"

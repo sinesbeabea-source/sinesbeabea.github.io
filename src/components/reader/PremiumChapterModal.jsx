@@ -5,9 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, Lock, Unlock, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const PREMIUM_PRICE = 10;
-
 export default function PremiumChapterModal({ chapter, bookId, userEmail, open, onClose, onUnlocked }) {
+  const PREMIUM_PRICE = chapter?.coin_price || 10;
   const queryClient = useQueryClient();
 
   const { data: wallets } = useQuery({

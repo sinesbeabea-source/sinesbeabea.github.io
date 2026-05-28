@@ -5,8 +5,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, X, Heart, UserPlus, UserCheck, ArrowRight,
-  Phone, PhoneOff, PhoneIncoming, BookOpen, ChevronRight
+  Phone, PhoneOff, BookOpen, ChevronRight
 } from 'lucide-react';
+import VoiceCall from '@/components/voice/VoiceCall';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
@@ -185,70 +186,7 @@ function ReadTogetherPanel({ matchId, buddyEmail, onClose }) {
   );
 }
 
-// ─── Call Overlay ────────────────────────────────────────────────────
-function CallOverlay({ matchId, buddyEmail, callStatus, isIncoming, onEnd }) {
-  const { user } = useAuth();
-  const [duration, setDuration] = useState(0);
-
-  useEffect(() => {
-    if (callStatus !== 'in_call') return;
-    const t = setInterval(() => setDuration(d => d + 1), 1000);
-    return () => clearInterval(t);
-  }, [callStatus]);
-
-  const fmtDuration = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-
-  const acceptCall = async () => {
-    await base44.entities.ReaderMatch.update(matchId, { call_status: 'in_call' });
-    // Also update buddy's record
-    const reverse = await base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email });
-    for (const r of reverse) {
-      await base44.entities.ReaderMatch.update(r.id, { call_status: 'in_call' });
-    }
-  };
-
-  const rejectCall = async () => {
-    await base44.entities.ReaderMatch.update(matchId, { call_status: 'idle', call_initiated_by: null });
-    const reverse = await base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email });
-    for (const r of reverse) {
-      await base44.entities.ReaderMatch.update(r.id, { call_status: 'idle', call_initiated_by: null });
-    }
-    onEnd();
-  };
-
-  const label = callStatus === 'in_call'
-    ? fmtDuration(duration)
-    : isIncoming ? 'โทรเข้า...' : 'กำลังโทร...';
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute inset-0 bg-gradient-to-b from-slate-900 to-background rounded-t-3xl sm:rounded-2xl flex flex-col items-center justify-center z-20"
-    >
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4">
-        <span className="text-3xl font-bold text-white">{buddyEmail?.[0]?.toUpperCase()}</span>
-      </div>
-      <p className="font-semibold text-lg mb-1">{buddyEmail?.split('@')[0]}</p>
-      <p className="text-sm text-muted-foreground mb-10">{label}</p>
-
-      <div className="flex items-center gap-6">
-        {isIncoming && callStatus === 'calling' && (
-          <button onClick={acceptCall}
-            className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors">
-            <Phone className="w-6 h-6 text-white" />
-          </button>
-        )}
-        <button onClick={rejectCall}
-          className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors">
-          <PhoneOff className="w-6 h-6 text-white" />
-        </button>
-      </div>
-      {callStatus === 'in_call' && (
-        <p className="text-xs text-muted-foreground mt-6 opacity-60">เสียงผ่านลำโพงอุปกรณ์ของคุณ</p>
-      )}
-    </motion.div>
-  );
-}
+// CallOverlay is now replaced by VoiceCall component
 
 // ─── Main Chat Popup ─────────────────────────────────────────────────
 export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose, onEnded }) {
@@ -404,10 +342,10 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
         className="relative w-full sm:max-w-md bg-card border border-border/50 rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl overflow-hidden"
         style={{ height: '75vh' }}
       >
-        {/* Call overlay */}
+        {/* Voice Call overlay */}
         <AnimatePresence>
           {showCall && (
-            <CallOverlay
+            <VoiceCall
               matchId={matchId}
               buddyEmail={buddyEmail}
               callStatus={isIncomingCall ? buddyCallStatus : callStatus}

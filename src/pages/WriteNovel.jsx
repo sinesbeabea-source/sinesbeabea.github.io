@@ -7,6 +7,7 @@ import { PenTool, Plus, Save, Sparkles, Loader2, Trash2, Eye, EyeOff, ArrowLeft,
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import GlassCard from '@/components/ui/GlassCard';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
@@ -20,6 +21,8 @@ export default function WriteNovel() {
   const [chapterContent, setChapterContent] = useState('');
   const [saving, setSaving] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [priceDialog, setPriceDialog] = useState(null); // chapter being priced
+  const [priceInput, setPriceInput] = useState('10');
 
   const { data: book } = useQuery({
     queryKey: ['write-book', bookId],
@@ -75,12 +78,21 @@ export default function WriteNovel() {
     refetchChapters();
   };
 
-  const togglePremium = async (ch, e) => {
+  const openPriceDialog = (ch, e) => {
     e.stopPropagation();
-    await base44.entities.Chapter.update(ch.id, {
-      is_premium: !ch.is_premium,
-      coin_price: !ch.is_premium ? 10 : 0,
-    });
+    if (ch.is_premium) {
+      // Toggle off immediately
+      base44.entities.Chapter.update(ch.id, { is_premium: false, coin_price: 0 }).then(refetchChapters);
+    } else {
+      setPriceInput(String(ch.coin_price || 10));
+      setPriceDialog(ch);
+    }
+  };
+
+  const confirmPremium = async () => {
+    const price = Math.max(1, parseInt(priceInput) || 10);
+    await base44.entities.Chapter.update(priceDialog.id, { is_premium: true, coin_price: price });
+    setPriceDialog(null);
     refetchChapters();
   };
 
@@ -145,6 +157,35 @@ export default function WriteNovel() {
   }
 
   return (
+    <>
+    {/* Price Dialog */}
+    <Dialog open={!!priceDialog} onOpenChange={(o) => !o && setPriceDialog(null)}>
+      <DialogContent className="max-w-xs">
+        <DialogHeader>
+          <DialogTitle>ตั้งราคาบทพรีเมียม 🔒</DialogTitle>
+        </DialogHeader>
+        <p className="text-sm text-muted-foreground mb-4">"{priceDialog?.title}"</p>
+        <div className="flex items-center gap-2 mb-6">
+          <Coins className="w-4 h-4 text-yellow-400 shrink-0" />
+          <Input
+            type="number"
+            min={1}
+            value={priceInput}
+            onChange={e => setPriceInput(e.target.value)}
+            className="flex-1"
+            placeholder="จำนวนเหรียญ"
+          />
+          <span className="text-sm text-muted-foreground">เหรียญ</span>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1" onClick={() => setPriceDialog(null)}>ยกเลิก</Button>
+          <Button className="flex-1 gap-2" onClick={confirmPremium}>
+            <Lock className="w-3 h-3" /> ล็อคบท
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
     <div className="h-[calc(100vh-4rem)] flex">
       {/* Chapter Sidebar */}
       <div className="w-64 border-r border-border/30 flex flex-col shrink-0 hidden md:flex">
@@ -166,7 +207,7 @@ export default function WriteNovel() {
               <span className="flex-1 truncate">#{ch.chapter_number || i + 1} {ch.title}</span>
               {ch.is_premium && <Coins className="w-3 h-3 text-yellow-400 shrink-0" />}
               <div className="hidden group-hover:flex items-center gap-1">
-                <button onClick={(e) => togglePremium(ch, e)} title={ch.is_premium ? 'ปลดล็อกฟรี' : 'ตั้งเป็นพรีเมียม (10 coins)'}>
+                <button onClick={(e) => openPriceDialog(ch, e)} title={ch.is_premium ? `พรีเมียม ${ch.coin_price} เหรียญ — คลิกเพื่อปลดล็อก` : 'ตั้งราคาพรีเมียม'}>
                   {ch.is_premium ? <Lock className="w-3 h-3 text-yellow-400" /> : <Unlock className="w-3 h-3 text-muted-foreground" />}
                 </button>
                 <button onClick={(e) => { e.stopPropagation(); togglePublish(ch); }}>
@@ -226,5 +267,6 @@ export default function WriteNovel() {
         </div>
       </div>
     </div>
+    </>
   );
 }
