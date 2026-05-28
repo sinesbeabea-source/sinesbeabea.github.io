@@ -206,7 +206,7 @@ export default function WriteNovel() {
             >
               <span className="flex-1 truncate">#{ch.chapter_number || i + 1} {ch.title}</span>
               {ch.is_premium && <Coins className="w-3 h-3 text-yellow-400 shrink-0" />}
-              <div className="hidden group-hover:flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 <button onClick={(e) => openPriceDialog(ch, e)} title={ch.is_premium ? `พรีเมียม ${ch.coin_price} เหรียญ — คลิกเพื่อปลดล็อก` : 'ตั้งราคาพรีเมียม'}>
                   {ch.is_premium ? <Lock className="w-3 h-3 text-yellow-400" /> : <Unlock className="w-3 h-3 text-muted-foreground" />}
                 </button>
