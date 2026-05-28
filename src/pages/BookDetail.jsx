@@ -136,13 +136,13 @@ export default function BookDetail() {
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 {chapters.length > 0 && (
                   <Link to={`/read/${id}/${chapters[0]?.id}`}>
-                    <Button size="lg" className="bg-gradient-to-r from-primary to-accent rounded-full gap-2 px-8">
-                      <BookOpen className="w-4 h-4" /> {myProgress?.status === 'reading' ? 'อ่านต่อ' : 'เริ่มอ่าน'}
+                    <Button size="lg" className="bg-gradient-to-r from-primary to-accent rounded-full gap-2 px-8 shadow-lg" style={{boxShadow:'0 4px 20px hsl(330 100% 72% / 0.4)'}}>
+                      <BookOpen className="w-5 h-5" /> {myProgress?.status === 'reading' ? 'อ่านต่อ' : 'เริ่มอ่าน'}
                     </Button>
                   </Link>
                 )}
                 <Select value={myProgress?.status || ''} onValueChange={(v) => addToLibrary.mutate(v)}>
-                  <SelectTrigger className="w-44 rounded-full">
+                  <SelectTrigger className="w-44 rounded-full border-2 border-primary/30 bg-muted/40 hover:border-primary/60 transition-all">
                     <SelectValue placeholder="+ เพิ่มในชั้นหนังสือ" />
                   </SelectTrigger>
                   <SelectContent>
@@ -191,7 +191,7 @@ export default function BookDetail() {
                                 พรีเมียม
                               </Badge>
                               <div className="flex items-center gap-0.5 text-[10px] text-yellow-400">
-                                <Coins className="w-2.5 h-2.5" /> 10
+                                <Coins className="w-2.5 h-2.5" /> {ch.coin_price || 10}
                               </div>
                             </div>
                           )}
@@ -213,9 +213,12 @@ export default function BookDetail() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-space font-bold">รีวิว</h2>
-              <Button variant="ghost" size="sm" onClick={() => setShowReviewForm(!showReviewForm)}>
+              <button
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="w-8 h-8 rounded-full bg-primary/15 hover:bg-primary/30 border border-primary/30 flex items-center justify-center text-primary transition-all duration-200"
+              >
                 <Plus className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
 
             {showReviewForm && (

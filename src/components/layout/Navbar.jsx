@@ -63,35 +63,33 @@ export default function Navbar({ user, notificationCount = 0 }) {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10">
-              <Search className="w-5 h-5" />
-            </Button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setSearchOpen(true)} className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 border border-border/40">
+              <Search className="w-4 h-4" />
+            </button>
             <Link to="/chat">
-              <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-accent hover:bg-accent/10">
-                <MessageCircle className="w-5 h-5" />
-              </Button>
+              <button className="w-9 h-9 rounded-full bg-muted/60 hover:bg-accent/20 flex items-center justify-center text-muted-foreground hover:text-accent transition-all duration-200 border border-border/40">
+                <MessageCircle className="w-4 h-4" />
+              </button>
             </Link>
             <Link to="/notifications" className="relative">
-              <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-primary hover:bg-primary/10">
-                <Bell className="w-5 h-5" />
+              <button className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 border border-border/40">
+                <Bell className="w-4 h-4" />
                 {notificationCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-primary text-[10px] text-white flex items-center justify-center font-bold" style={{boxShadow:'0 2px 8px hsl(330 100% 72% / 0.5)'}}>
                     {notificationCount > 9 ? '9+' : notificationCount}
                   </span>
                 )}
-              </Button>
+              </button>
             </Link>
             <Link to="/profile">
-              <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center" style={{boxShadow:'0 2px 12px hsl(330 100% 72% / 0.4)'}}>
-                  <User className="w-3.5 h-3.5 text-white" />
-                </div>
-              </Button>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-200" style={{boxShadow:'0 2px 12px hsl(330 100% 72% / 0.5)'}}>
+                <User className="w-4 h-4 text-white" />
+              </div>
             </Link>
-            <Button variant="ghost" size="icon" className="md:hidden rounded-full text-muted-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+            <button className="md:hidden w-9 h-9 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground border border-border/40" onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
           </div>
         </div>
 
