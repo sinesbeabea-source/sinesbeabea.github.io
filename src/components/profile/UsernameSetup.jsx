@@ -18,9 +18,9 @@ export default function UsernameSetup({ onDone }) {
     setLoading(true);
     setError('');
 
-    // Check uniqueness
-    const existing = await base44.entities.User.list();
-    const taken = existing.some(u => u.username === value);
+    // Check uniqueness (filter by username only — much faster)
+    const existing = await base44.entities.User.filter({ username: value });
+    const taken = existing.length > 0;
     if (taken) {
       setError('username นี้ถูกใช้แล้ว ลองใหม่นะครับ');
       setLoading(false);
