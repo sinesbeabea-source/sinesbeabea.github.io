@@ -172,37 +172,36 @@ export default function Matching() {
       matched_email: buddy.user_email,
     });
 
-    // Only skip if there's already an active (non-ended) like/accepted record
+    // Only skip if there's already an active pending like (not yet responded)
     const activeRecord = existing.find(r => r.status === 'liked' || r.status === 'accepted');
     if (activeRecord) {
       setLikedEmails(prev => new Set([...prev, buddy.user_email]));
       return;
     }
 
-    // If old ended record exists, reuse it; otherwise create new
-    const endedRecord = existing.find(r => r.status === 'ended' || r.status === 'rejected' || r.status === 'skipped');
-    if (endedRecord) {
-      await base44.entities.ReaderMatch.update(endedRecord.id, {
-        status: 'liked',
-        liked_at: new Date().toISOString(),
-        book_id: selectedBook?.id,
-        book_title: selectedBook?.title,
-        popup_opened: false,
-        ended_at: null,
-        accepted_at: null,
-        sync_active: false,
-        call_status: 'idle',
-      });
-    } else {
-      await base44.entities.ReaderMatch.create({
-        user_email: user?.email,
-        matched_email: buddy.user_email,
-        status: 'liked',
-        liked_at: new Date().toISOString(),
-        book_id: selectedBook?.id,
-        book_title: selectedBook?.title,
-      });
+    // Delete ALL old records with this buddy to fully reset history, then create fresh
+    for (const r of existing) {
+      await base44.entities.ReaderMatch.delete(r.id);
     }
+    // Also delete buddy's old records toward me (reset both sides)
+    const buddyOldRecords = await base44.entities.ReaderMatch.filter({
+      user_email: buddy.user_email,
+      matched_email: user?.email,
+    });
+    for (const r of buddyOldRecords) {
+      if (r.status === 'ended' || r.status === 'rejected' || r.status === 'skipped') {
+        await base44.entities.ReaderMatch.delete(r.id);
+      }
+    }
+
+    await base44.entities.ReaderMatch.create({
+      user_email: user?.email,
+      matched_email: buddy.user_email,
+      status: 'liked',
+      liked_at: new Date().toISOString(),
+      book_id: selectedBook?.id,
+      book_title: selectedBook?.title,
+    });
 
     // Notify the buddy
     await base44.entities.Notification.create({

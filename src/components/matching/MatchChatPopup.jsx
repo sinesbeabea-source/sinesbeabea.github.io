@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Send, X, Heart, UserPlus, UserCheck, ArrowRight,
-  Phone, PhoneOff, BookOpen, ChevronRight, ChevronDown
+  Phone, PhoneOff, BookOpen, ChevronRight, ChevronDown, Image, Loader2
 } from 'lucide-react';
 import VoiceCall from '@/components/voice/VoiceCall';
 import { Button } from '@/components/ui/button';
@@ -83,7 +83,7 @@ function AfterChatPopup({ matchedEmail, onClose }) {
 }
 
 // ─── Read Together Panel ─────────────────────────────────────────────
-function ReadTogetherPanel({ matchId, buddyEmail, onClose }) {
+function ReadTogetherPanel({ matchId, buddyEmail, userEmail, onClose }) {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
@@ -103,15 +103,23 @@ function ReadTogetherPanel({ matchId, buddyEmail, onClose }) {
   };
 
   const startReading = async (chapter) => {
-    // Sync read state on match record
-    await base44.entities.ReaderMatch.update(matchId, {
+    const syncData = {
       sync_book_id: selectedBook.id,
       sync_book_title: selectedBook.title,
       sync_chapter_id: chapter.id,
       sync_chapter_number: chapter.chapter_number,
       sync_chapter_title: chapter.title,
       sync_active: true,
+    };
+    // Sync my record
+    await base44.entities.ReaderMatch.update(matchId, syncData);
+    // Sync buddy's record
+    const buddyRecords = await base44.entities.ReaderMatch.filter({
+      user_email: buddyEmail, matched_email: userEmail,
     });
+    for (const r of buddyRecords) {
+      await base44.entities.ReaderMatch.update(r.id, syncData);
+    }
     // Notify buddy
     await base44.entities.Notification.create({
       user_email: buddyEmail,
@@ -252,12 +260,17 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef(null);
+
   const sendMessage = useMutation({
-    mutationFn: () => base44.entities.ChatMessage.create({
+    mutationFn: (overrides = {}) => base44.entities.ChatMessage.create({
       room_id: chatRoom.id,
       sender_email: user?.email,
       sender_name: user?.full_name || user?.email,
       content: message,
+      message_type: 'text',
+      ...overrides,
     }),
     onSuccess: () => {
       setMessage('');
@@ -265,22 +278,36 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     },
   });
 
-  const handleCall = async () => {
-    await base44.entities.ReaderMatch.update(matchId, {
-      call_status: 'calling',
-      call_initiated_by: user?.email,
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !chatRoom) return;
+    setUploadingImage(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    await base44.entities.ChatMessage.create({
+      room_id: chatRoom.id,
+      sender_email: user?.email,
+      sender_name: user?.full_name || user?.email,
+      content: file_url,
+      message_type: 'image',
     });
-    // Update buddy's record too
+    queryClient.invalidateQueries({ queryKey: ['popup-messages', chatRoom?.id] });
+    setUploadingImage(false);
+    e.target.value = '';
+  };
+
+  const syncBothSides = async (data) => {
+    const updates = [base44.entities.ReaderMatch.update(matchId, data)];
     const reverse = await base44.entities.ReaderMatch.filter({
-      user_email: buddyEmail,
-      matched_email: user?.email,
+      user_email: buddyEmail, matched_email: user?.email,
     });
-    for (const r of reverse) {
-      await base44.entities.ReaderMatch.update(r.id, {
-        call_status: 'calling',
-        call_initiated_by: user?.email,
-      });
-    }
+    for (const r of reverse) updates.push(base44.entities.ReaderMatch.update(r.id, data));
+    await Promise.all(updates);
+    queryClient.invalidateQueries({ queryKey: ['match-record', matchId] });
+    queryClient.invalidateQueries({ queryKey: ['buddy-match-record', buddyEmail] });
+  };
+
+  const handleCall = async () => {
+    await syncBothSides({ call_status: 'calling', call_initiated_by: user?.email });
     await base44.entities.Notification.create({
       user_email: buddyEmail,
       type: 'message',
@@ -288,19 +315,10 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
       message: `${user?.full_name || user?.email?.split('@')[0]} กำลังโทรหาคุณ`,
       from_user: user?.email,
     });
-    queryClient.invalidateQueries({ queryKey: ['match-record', matchId] });
   };
 
   const handleEndCall = async () => {
-    await base44.entities.ReaderMatch.update(matchId, { call_status: 'idle', call_initiated_by: null });
-    const reverse = await base44.entities.ReaderMatch.filter({
-      user_email: buddyEmail,
-      matched_email: user?.email,
-    });
-    for (const r of reverse) {
-      await base44.entities.ReaderMatch.update(r.id, { call_status: 'idle', call_initiated_by: null });
-    }
-    queryClient.invalidateQueries({ queryKey: ['match-record', matchId] });
+    await syncBothSides({ call_status: 'idle', call_initiated_by: null });
   };
 
   const handleEndChat = async () => {
@@ -373,6 +391,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
             <ReadTogetherPanel
               matchId={matchId}
               buddyEmail={buddyEmail}
+              userEmail={user?.email}
               onClose={() => setShowReadTogether(false)}
             />
           )}
@@ -452,16 +471,27 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
           )}
           {messages.map(msg => {
             const isMe = msg.sender_email === user?.email;
+            const isImage = msg.message_type === 'image';
             return (
               <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
-                  <div className={`px-3 py-2 rounded-2xl text-sm ${
-                    isMe
-                      ? 'bg-gradient-to-r from-rose-500 to-primary text-white rounded-br-sm'
-                      : 'glass text-foreground rounded-bl-sm border border-border/30'
-                  }`}>
-                    {msg.content}
-                  </div>
+                  {isImage ? (
+                    <a href={msg.content} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={msg.content}
+                        alt="รูปภาพ"
+                        className="max-w-[200px] rounded-2xl object-cover border border-border/30"
+                      />
+                    </a>
+                  ) : (
+                    <div className={`px-3 py-2 rounded-2xl text-sm ${
+                      isMe
+                        ? 'bg-gradient-to-r from-rose-500 to-primary text-white rounded-br-sm'
+                        : 'glass text-foreground rounded-bl-sm border border-border/30'
+                    }`}>
+                      {msg.content}
+                    </div>
+                  )}
                   <span className="text-[10px] text-muted-foreground px-1">
                     {msg.created_date ? format(new Date(msg.created_date), 'HH:mm') : ''}
                   </span>
@@ -474,6 +504,23 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
 
         {/* Input */}
         <div className="p-3 border-t border-border/30 flex gap-2 shrink-0">
+          <input
+            type="file"
+            accept="image/*"
+            ref={imageInputRef}
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+          <Button
+            size="icon"
+            variant="ghost"
+            className="rounded-full shrink-0 text-muted-foreground hover:text-accent"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={uploadingImage || !chatRoom}
+            title="ส่งรูปภาพ"
+          >
+            {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Image className="w-4 h-4" />}
+          </Button>
           <Input
             value={message}
             onChange={e => setMessage(e.target.value)}
