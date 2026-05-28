@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, Search, Bell, MessageCircle, User, Menu, X, 
-  Sparkles, Home, Users, PenTool, Library, UsersRound
+  Sparkles, Home, Users, PenTool, Library, UsersRound, Bookmark, Layers
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -124,6 +124,16 @@ export default function Navbar({ user, notificationCount = 0 }) {
                 <Link to="/coin-shop" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl font-semibold text-muted-foreground hover:text-accent hover:bg-accent/8">
                     <Sparkles className="w-4 h-4" /> เหรียญ
+                  </Button>
+                </Link>
+                <Link to="/bookmarks" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl font-semibold text-muted-foreground hover:text-primary hover:bg-primary/8">
+                    <Bookmark className="w-4 h-4" /> บุ๊คมาร์ค
+                  </Button>
+                </Link>
+                <Link to="/series" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl font-semibold text-muted-foreground hover:text-primary hover:bg-primary/8">
+                    <Layers className="w-4 h-4" /> ซีรีส์
                   </Button>
                 </Link>
               </div>

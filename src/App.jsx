@@ -40,6 +40,8 @@ import MatchChat from '@/pages/MatchChat';
 import CoinShop from '@/pages/CoinShop';
 import BookClubs from '@/pages/BookClubs';
 import UserProfile from '@/pages/UserProfile';
+import SeriesPage from '@/pages/Series';
+import Bookmarks from '@/pages/Bookmarks';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -100,6 +102,8 @@ const AuthenticatedApp = () => {
           <Route path="/coin-shop" element={<CoinShop />} />
           <Route path="/book-clubs" element={<BookClubs />} />
           <Route path="/user/:email" element={<UserProfile />} />
+          <Route path="/series" element={<SeriesPage />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
         </Route>
 
         {/* Reader - no layout for immersive experience */}

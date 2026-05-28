@@ -1,0 +1,36 @@
+{
+  "name": "Bookmark",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "book_id": {
+      "type": "string"
+    },
+    "chapter_id": {
+      "type": "string"
+    },
+    "chapter_title": {
+      "type": "string"
+    },
+    "chapter_number": {
+      "type": "number"
+    },
+    "book_title": {
+      "type": "string"
+    },
+    "scroll_position": {
+      "type": "number",
+      "default": 0
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "book_id",
+    "chapter_id"
+  ]
+}

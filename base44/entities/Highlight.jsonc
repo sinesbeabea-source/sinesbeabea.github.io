@@ -1,0 +1,43 @@
+{
+  "name": "Highlight",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string"
+    },
+    "book_id": {
+      "type": "string"
+    },
+    "chapter_id": {
+      "type": "string"
+    },
+    "selected_text": {
+      "type": "string"
+    },
+    "note": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "enum": [
+        "yellow",
+        "pink",
+        "green",
+        "blue"
+      ],
+      "default": "yellow"
+    },
+    "char_start": {
+      "type": "number"
+    },
+    "char_end": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "user_email",
+    "book_id",
+    "chapter_id",
+    "selected_text"
+  ]
+}

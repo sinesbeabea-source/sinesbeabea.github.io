@@ -9,6 +9,9 @@ import { Slider } from '@/components/ui/slider';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Loader2 } from 'lucide-react';
 import PremiumChapterModal from '@/components/reader/PremiumChapterModal';
+import BookmarkButton from '@/components/reader/BookmarkButton';
+import TTSButton from '@/components/reader/TTSButton';
+import HighlightLayer from '@/components/reader/HighlightLayer';
 
 export default function EbookReader() {
   const { bookId, chapterId } = useParams();
@@ -112,6 +115,16 @@ export default function EbookReader() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <TTSButton text={chapter?.content} />
+            <BookmarkButton
+              user={user}
+              bookId={bookId}
+              chapterId={chapterId}
+              chapterTitle={chapter?.title}
+              chapterNumber={chapter?.chapter_number}
+              bookTitle={book?.title}
+              scrollPosition={window.scrollY}
+            />
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon"><List className="w-5 h-5" /></Button>
@@ -193,11 +206,13 @@ export default function EbookReader() {
         ) : (
           <>
             <h1 className="text-2xl font-bold mb-8 text-center">{chapter?.title}</h1>
-            <div
-              className="prose prose-invert max-w-none leading-relaxed"
-              style={{ fontSize: `${fontSize}px`, lineHeight: '1.8' }}
-              dangerouslySetInnerHTML={{ __html: chapter?.content || '<p>ยังไม่มีเนื้อหาในบทนี้</p>' }}
-            />
+            <HighlightLayer user={user} bookId={bookId} chapterId={chapterId}>
+              <div
+                className="prose prose-invert max-w-none leading-relaxed"
+                style={{ fontSize: `${fontSize}px`, lineHeight: '1.8' }}
+                dangerouslySetInnerHTML={{ __html: chapter?.content || '<p>ยังไม่มีเนื้อหาในบทนี้</p>' }}
+              />
+            </HighlightLayer>
           </>
         )}
       </div>
