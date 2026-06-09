@@ -32,53 +32,36 @@ export default function GlobalMatchWatcher() {
       try {
         const current = chatPopupRef.current;
 
-        // 1) If we have an active match (full or minimized), watch if buddy ended it
+        // Single query: fetch all my accepted matches
+        const allAccepted = await base44.entities.ReaderMatch.filter({
+          user_email: user.email,
+          status: 'accepted',
+        });
+
+        // 1) If we have an active popup, verify it's still alive
         if (current) {
-          const matches = await base44.entities.ReaderMatch.filter({
-            user_email: user.email,
-            matched_email: current.buddyEmail,
-          });
-          const live = matches.find(m => m.id === current.matchId);
-          if (!live || live.status === 'ended' || live.status === 'rejected') {
+          const live = allAccepted.find(m => m.id === current.matchId);
+          if (!live) {
             setChatPopup(null);
             setMinimized(false);
           }
-          return; // don't look for new matches while one is active
+          return;
         }
 
-        // 2) Look for newly accepted match not yet shown as popup
-        const accepted = await base44.entities.ReaderMatch.filter({
-          user_email: user.email,
-          status: 'accepted',
-          popup_opened: false,
-        });
-        if (accepted.length > 0) {
-          const m = accepted[0];
-          await base44.entities.ReaderMatch.update(m.id, { popup_opened: true });
-          setChatPopup({
-            matchId: m.id,
-            buddyEmail: m.matched_email,
-            bookTitle: m.book_title,
-          });
+        // 2) New match not yet shown
+        const newMatch = allAccepted.find(m => !m.popup_opened);
+        if (newMatch) {
+          await base44.entities.ReaderMatch.update(newMatch.id, { popup_opened: true });
+          setChatPopup({ matchId: newMatch.id, buddyEmail: newMatch.matched_email, bookTitle: newMatch.book_title });
           setMinimized(false);
           return;
         }
 
-        // 3) Also re-open if there's an accepted+popup_opened match that we lost track of
-        //    (e.g. page refresh while popup was open)
-        const openMatch = await base44.entities.ReaderMatch.filter({
-          user_email: user.email,
-          status: 'accepted',
-          popup_opened: true,
-        });
-        if (openMatch.length > 0) {
-          const m = openMatch[0];
-          setChatPopup({
-            matchId: m.id,
-            buddyEmail: m.matched_email,
-            bookTitle: m.book_title,
-          });
-          setMinimized(true); // restore minimized so it doesn't jump in their face
+        // 3) Restore popup after page refresh
+        const existing = allAccepted.find(m => m.popup_opened);
+        if (existing) {
+          setChatPopup({ matchId: existing.id, buddyEmail: existing.matched_email, bookTitle: existing.book_title });
+          setMinimized(true);
         }
       } finally {
         processingRef.current = false;
@@ -86,7 +69,7 @@ export default function GlobalMatchWatcher() {
     };
 
     check();
-    const interval = setInterval(check, 4000);
+    const interval = setInterval(check, 10000);
     return () => clearInterval(interval);
   }, [user?.email]);
 
