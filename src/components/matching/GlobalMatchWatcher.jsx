@@ -63,13 +63,18 @@ export default function GlobalMatchWatcher() {
           setChatPopup({ matchId: existing.id, buddyEmail: existing.matched_email, bookTitle: existing.book_title });
           setMinimized(true);
         }
+      } catch (err) {
+        // Silently ignore rate limit errors — next interval will retry
+        if (!err?.message?.includes('Rate limit')) {
+          console.error('GlobalMatchWatcher error:', err);
+        }
       } finally {
         processingRef.current = false;
       }
     };
 
     check();
-    const interval = setInterval(check, 10000);
+    const interval = setInterval(check, 30000);
     return () => clearInterval(interval);
   }, [user?.email]);
 
