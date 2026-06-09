@@ -140,22 +140,143 @@ export default function Presentation() {
       const { default: html2canvas } = await import('html2canvas');
       const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540] });
 
+      // Create an off-screen container for rendering each slide
+      const container = document.createElement('div');
+      container.style.cssText = 'position:fixed;left:-9999px;top:0;width:960px;height:540px;overflow:hidden;z-index:-1;';
+      document.body.appendChild(container);
+
       for (let i = 0; i < slides.length; i++) {
-        goTo(i);
-        await new Promise(r => setTimeout(r, 600));
-        const el = document.getElementById('slide-content');
-        if (!el) continue;
-        const canvas = await html2canvas(el, { scale: 1.5, useCORS: true, backgroundColor: null });
+        const s = slides[i];
+        // Build a plain static HTML version of the slide with inline styles
+        container.innerHTML = '';
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = `width:960px;height:540px;display:flex;align-items:center;justify-content:center;padding:40px;box-sizing:border-box;position:relative;overflow:hidden;`;
+        wrapper.setAttribute('data-slide-id', s.id);
+
+        // Resolve gradient to actual colors for background
+        const bgColors = {
+          'from-slate-950 via-purple-950 to-slate-900': '#0b0a1a, #1e0a3c, #0f172a',
+          'from-slate-950 to-slate-900': '#0b0a1a, #0f172a',
+          'from-slate-950 to-purple-950': '#0b0a1a, #1e0a3c',
+          'from-slate-950 to-pink-950': '#0b0a1a, #2d0a1a',
+          'from-slate-950 to-blue-950': '#0b0a1a, #0a0a2d',
+          'from-slate-950 to-orange-950': '#0b0a1a, #1a0d00',
+        };
+        const bg = bgColors[s.bg] || '#0b0a1a, #0f172a';
+        wrapper.style.background = `linear-gradient(135deg, ${bg})`;
+
+        // Render slide content as plain HTML strings
+        wrapper.innerHTML = getStaticSlideHTML(s);
+        container.appendChild(wrapper);
+
+        await new Promise(r => setTimeout(r, 100));
+
+        const canvas = await html2canvas(container, {
+          scale: 1,
+          useCORS: true,
+          backgroundColor: '#0b0a1a',
+          width: 960,
+          height: 540,
+          logging: false,
+        });
         const imgData = canvas.toDataURL('image/jpeg', 0.92);
         if (i > 0) pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, 0, 960, 540);
       }
+
+      document.body.removeChild(container);
       pdf.save('BookMatch-AI-Presentation.pdf');
-      goTo(0);
     } catch (e) {
       console.error(e);
     }
     setExporting(false);
+  };
+
+  // Returns static HTML string for a slide (no Tailwind, inline styles only)
+  const getStaticSlideHTML = (s) => {
+    const gradientMap = {
+      'from-[#FF85C2] via-[#c084fc] to-[#85FFD4]': 'linear-gradient(135deg,#FF85C2,#c084fc,#85FFD4)',
+      'from-rose-500 to-orange-500': 'linear-gradient(135deg,#f43f5e,#f97316)',
+      'from-[#FF85C2] to-[#85FFD4]': 'linear-gradient(135deg,#FF85C2,#85FFD4)',
+      'from-pink-500 to-rose-500': 'linear-gradient(135deg,#ec4899,#f43f5e)',
+      'from-cyan-500 to-blue-500': 'linear-gradient(135deg,#06b6d4,#3b82f6)',
+      'from-yellow-500 to-orange-500': 'linear-gradient(135deg,#eab308,#f97316)',
+      'from-[#FF85C2] to-[#c084fc]': 'linear-gradient(135deg,#FF85C2,#c084fc)',
+    };
+    const grad = gradientMap[s.gradient] || 'linear-gradient(135deg,#FF85C2,#85FFD4)';
+    const textGrad = (text) => `<span style="background:${grad};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">${text}</span>`;
+
+    if (s.type === 'cover') return `
+      <div style="text-align:center;">
+        <div style="font-size:80px;margin-bottom:16px;">${s.emoji}</div>
+        <h1 style="font-size:64px;font-weight:900;margin:0 0 12px;">${textGrad(s.title)}</h1>
+        <p style="font-size:20px;color:rgba(255,255,255,0.7);white-space:pre-line;">${s.subtitle}</p>
+      </div>`;
+
+    if (s.type === 'problem') return `
+      <div style="width:100%;">
+        <h2 style="font-size:40px;font-weight:900;text-align:center;margin:0 0 32px;">${textGrad(s.title)}</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          ${s.points.map(p => `
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:20px;">
+              <span style="font-size:32px;">${p.icon}</span>
+              <p style="color:rgba(255,255,255,0.8);font-size:15px;margin:0;">${p.text}</p>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'solution') return `
+      <div style="width:100%;text-align:center;">
+        <h2 style="font-size:40px;font-weight:900;margin:0 0 8px;">${textGrad(s.title)}</h2>
+        <p style="color:rgba(255,255,255,0.6);margin:0 0 32px;font-size:14px;">${s.subtitle}</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+          ${s.features.map(f => `
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:24px 16px;display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div style="font-size:28px;">⭐</div>
+              <p style="font-weight:700;color:#fff;font-size:14px;margin:0;">${f.label}</p>
+              <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">${f.desc}</p>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'feature-detail') return `
+      <div style="text-align:center;">
+        <div style="font-size:64px;margin-bottom:16px;">${s.emoji}</div>
+        <h2 style="font-size:40px;font-weight:900;margin:0 0 12px;">${textGrad(s.title)}</h2>
+        <p style="color:rgba(255,255,255,0.6);margin:0 0 32px;white-space:pre-line;font-size:14px;">${s.subtitle}</p>
+        <div style="display:flex;justify-content:center;gap:24px;">
+          ${s.stats.map(st => `
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:24px 40px;">
+              <div style="font-size:32px;font-weight:900;color:#fff;margin-bottom:4px;">${st.value}</div>
+              <div style="color:rgba(255,255,255,0.5);font-size:12px;">${st.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'features-grid') return `
+      <div style="width:100%;">
+        <h2 style="font-size:40px;font-weight:900;text-align:center;margin:0 0 24px;">${textGrad(s.title)}</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          ${s.items.map(item => `
+            <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:18px;">
+              <div style="font-size:24px;">✨</div>
+              <div>
+                <p style="font-weight:700;color:#fff;font-size:14px;margin:0;">${item.label}</p>
+                <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">${item.desc}</p>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'cta') return `
+      <div style="text-align:center;">
+        <div style="font-size:80px;margin-bottom:20px;">${s.emoji}</div>
+        <h2 style="font-size:52px;font-weight:900;margin:0 0 16px;">${textGrad(s.title)}</h2>
+        <p style="color:rgba(255,255,255,0.7);font-size:18px;white-space:pre-line;margin:0 0 32px;">${s.subtitle}</p>
+        <div style="display:inline-block;padding:14px 40px;border-radius:999px;background:${grad};color:#1a1033;font-weight:900;font-size:20px;">BookMatch AI ✨</div>
+      </div>`;
+
+    return '';
   };
 
   const slide = slides[current];
