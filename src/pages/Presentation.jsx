@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Download, X, BookOpen, Users, Heart, Mic, Star, Coins, Sparkles, MessageCircle, Library, Zap } from 'lucide-react';
+import PhoneMockupScreen from '@/components/presentation/PhoneMockupScreen';
 import { Button } from '@/components/ui/button';
 
 const slides = [
@@ -99,33 +100,60 @@ const slides = [
   },
   {
     id: 8,
+    type: 'app-preview',
+    screenId: 'home',
+    title: 'หน้าแรก (Home)',
+    subtitle: 'จุดเริ่มต้นของทุกประสบการณ์การอ่าน',
+    color: '#FF85C2',
+    gradient: 'from-[#FF85C2] to-[#c084fc]',
+    bg: 'from-slate-950 to-purple-950',
+    highlights: [
+      { label: 'Featured Books', desc: 'หนังสือแนะนำของวัน คัดโดย AI' },
+      { label: 'Trending Now', desc: 'กำลังฮิตในชุมชนนักอ่าน' },
+      { label: 'Quick Match', desc: 'เริ่มหาคู่อ่านได้เลยจากหน้านี้' },
+    ],
+  },
+  {
+    id: 9,
+    type: 'app-preview',
+    screenId: 'matching',
+    title: 'หน้าจับคู่ (Matching)',
+    subtitle: 'เลือกหนังสือแล้วให้ AI หาคู่อ่านที่ใช่',
+    color: '#c084fc',
+    gradient: 'from-[#c084fc] to-[#FF85C2]',
+    bg: 'from-slate-950 to-pink-950',
+    highlights: [
+      { label: 'เลือกหนังสือ', desc: 'เลือกเล่มที่กำลังอ่านอยู่' },
+      { label: 'AI Match', desc: 'ระบบ AI หาคนที่ชอบเล่มเดียวกัน' },
+      { label: 'Chat & Call', desc: 'แชทหรือโทรหากันได้ทันที' },
+    ],
+  },
+  {
+    id: 10,
+    type: 'app-preview',
+    screenId: 'reader',
+    title: 'หน้าอ่านหนังสือ (Reader)',
+    subtitle: 'อ่านนิยายอย่างเพลิดเพลินด้วย Reader ที่ปรับได้เต็มที่',
+    color: '#60a5fa',
+    gradient: 'from-[#60a5fa] to-[#85FFD4]',
+    bg: 'from-slate-950 to-blue-950',
+    highlights: [
+      { label: 'ปรับ Font & Theme', desc: 'เลือก font, ขนาด, และสีพื้นหลัง' },
+      { label: 'Highlight & Note', desc: 'ไฮไลต์ข้อความและจดโน้ตส่วนตัว' },
+      { label: 'Text-to-Speech', desc: 'เปิดให้แอปอ่านออกเสียงได้เลย' },
+    ],
+  },
+  {
+    id: 11,
     type: 'page-tour',
-    title: 'ทัวร์หน้าเว็บ',
+    title: 'ฟีเจอร์อื่นๆ ในแอป',
     subtitle: 'แต่ละหน้าออกแบบมาเพื่อประสบการณ์นักอ่านที่ดีที่สุด',
     pages: [
-      {
-        emoji: '🏠',
-        name: 'หน้าแรก (Home)',
-        color: '#FF85C2',
-        features: ['แนะนำหนังสือ Featured', 'Trending & New releases', 'Quick access ไปทุกฟีเจอร์'],
-      },
       {
         emoji: '🔍',
         name: 'ค้นหา (Discover)',
         color: '#85FFD4',
-        features: ['ค้นหาหนังสือด้วย Keyword', 'Filter ตามแนว/อารมณ์/Rating', 'AI แนะนำส่วนตัว'],
-      },
-      {
-        emoji: '💘',
-        name: 'จับคู่ (Matching)',
-        color: '#c084fc',
-        features: ['เลือกหนังสือที่กำลังอ่าน', 'AI จับคู่กับนักอ่านคนอื่น', 'แชท + โทรหากันได้เลย'],
-      },
-      {
-        emoji: '📖',
-        name: 'อ่านหนังสือ (Reader)',
-        color: '#60a5fa',
-        features: ['Reader ปรับ font/theme ได้', 'Highlight & Bookmark', 'Text-to-Speech ในตัว'],
+        features: ['ค้นหาด้วย Keyword', 'Filter ตามแนว/อารมณ์', 'AI แนะนำส่วนตัว'],
       },
       {
         emoji: '✍️',
@@ -139,12 +167,30 @@ const slides = [
         color: '#34d399',
         features: ['โพสต์รีวิว/ถกเถียง', 'Follow นักอ่านคนอื่น', 'Book Clubs กลุ่มอ่านร่วม'],
       },
+      {
+        emoji: '📚',
+        name: 'ห้องสมุด (Library)',
+        color: '#60a5fa',
+        features: ['บันทึกรายการอ่าน', 'ติดตาม Progress', 'จัดการ Bookmark'],
+      },
+      {
+        emoji: '💰',
+        name: 'ระบบ Coin',
+        color: '#fbbf24',
+        features: ['ซื้อบทพรีเมียม', 'Daily reward', 'รับ Coin จากการเขียน'],
+      },
+      {
+        emoji: '👤',
+        name: 'โปรไฟล์ (Profile)',
+        color: '#FF85C2',
+        features: ['สถิติการอ่าน', 'ผลงานนิยาย', 'ติดตาม/ผู้ติดตาม'],
+      },
     ],
     gradient: 'from-[#FF85C2] to-[#c084fc]',
     bg: 'from-slate-950 to-purple-950',
   },
   {
-    id: 9,
+    id: 12,
     type: 'cta',
     title: 'เริ่มต้นการอ่านที่ดีกว่า',
     subtitle: 'เข้าร่วม BookMatch AI วันนี้\nพบคู่อ่านและนิยายที่ใช่สำหรับคุณ',
@@ -309,6 +355,69 @@ export default function Presentation() {
               <div>
                 <p style="font-weight:700;color:#fff;font-size:14px;margin:0;">${item.label}</p>
                 <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">${item.desc}</p>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'app-preview') return `
+      <div style="width:100%;display:flex;gap:40px;align-items:center;">
+        <div style="flex-shrink:0;">
+          <div style="width:160px;height:290px;border-radius:24px;border:3px solid rgba(255,255,255,0.2);overflow:hidden;background:#0f172a;box-shadow:0 0 40px ${s.color}44;">
+            <div style="background:#1e293b;padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:rgba(255,255,255,0.5);font-size:8px;">9:41</span>
+            </div>
+            <div style="padding:10px;height:100%;">
+              ${s.screenId === 'home' ? `
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+                  <div style="width:20px;height:20px;border-radius:50%;background:${s.color};opacity:0.8;"></div>
+                  <span style="color:#fff;font-size:9px;font-weight:700;">BookMatch AI</span>
+                </div>
+                <div style="background:${s.color}33;border-radius:10px;padding:8px;margin-bottom:6px;">
+                  <div style="width:60%;height:6px;background:${s.color};border-radius:4px;margin-bottom:4px;"></div>
+                  <div style="width:80%;height:6px;background:rgba(255,255,255,0.2);border-radius:4px;"></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
+                  ${[1,2,3,4].map(_ => `<div style="background:rgba(255,255,255,0.07);border-radius:8px;height:40px;"></div>`).join('')}
+                </div>
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.1);border-radius:4px;"></div>
+              ` : s.screenId === 'matching' ? `
+                <div style="text-align:center;padding:6px 0;">
+                  <div style="font-size:20px;margin-bottom:4px;">💘</div>
+                  <div style="width:70%;height:5px;background:${s.color};border-radius:4px;margin:0 auto 8px;"></div>
+                </div>
+                <div style="background:${s.color}22;border-radius:10px;padding:8px;margin-bottom:6px;display:flex;gap:6px;align-items:center;">
+                  <div style="width:30px;height:42px;background:rgba(255,255,255,0.15);border-radius:6px;"></div>
+                  <div>
+                    <div style="width:60px;height:5px;background:rgba(255,255,255,0.5);border-radius:4px;margin-bottom:3px;"></div>
+                    <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:4px;"></div>
+                  </div>
+                </div>
+                <div style="text-align:center;">
+                  <div style="display:inline-block;padding:5px 14px;border-radius:20px;background:${s.color};color:#1a1033;font-size:8px;font-weight:700;">หาคู่อ่าน ❤️</div>
+                </div>
+              ` : `
+                <div style="background:#1e1b4b;padding:8px;border-radius:8px;height:85%;">
+                  <div style="width:80%;height:4px;background:rgba(255,255,255,0.15);border-radius:4px;margin-bottom:4px;"></div>
+                  <div style="width:95%;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;margin-bottom:4px;"></div>
+                  <div style="width:70%;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;margin-bottom:4px;"></div>
+                  <div style="width:90%;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;margin-bottom:4px;"></div>
+                  <div style="width:60%;height:4px;background:${s.color};border-radius:4px;margin-bottom:4px;opacity:0.6;"></div>
+                  <div style="width:85%;height:4px;background:rgba(255,255,255,0.1);border-radius:4px;"></div>
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+        <div style="flex:1;">
+          <h2 style="font-size:28px;font-weight:900;margin:0 0 8px;">${textGrad(s.title)}</h2>
+          <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0 0 20px;">${s.subtitle}</p>
+          ${s.highlights.map(h => `
+            <div style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px;margin-bottom:8px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:${s.color};margin-top:3px;flex-shrink:0;"></div>
+              <div>
+                <p style="font-weight:700;color:#fff;font-size:12px;margin:0;">${h.label}</p>
+                <p style="color:rgba(255,255,255,0.5);font-size:10px;margin:0;">${h.desc}</p>
               </div>
             </div>`).join('')}
         </div>
@@ -539,6 +648,47 @@ function SlideContent({ slide }) {
             </motion.div>
           );
         })}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'app-preview') return (
+    <div className="relative z-10 w-full flex gap-8 items-center">
+      {/* Phone mockup */}
+      <div className="shrink-0">
+        <div className="w-44 h-80 rounded-3xl border-4 border-white/20 overflow-hidden bg-slate-900 shadow-2xl relative"
+          style={{ boxShadow: `0 0 40px ${slide.color}44` }}>
+          {/* Status bar */}
+          <div className="bg-slate-800 px-3 py-1.5 flex justify-between items-center">
+            <span className="text-white/60 text-[8px]">9:41</span>
+            <div className="flex gap-1">
+              <div className="w-3 h-1.5 bg-white/40 rounded-sm"/>
+              <div className="w-1 h-1.5 bg-white/40 rounded-sm"/>
+            </div>
+          </div>
+          <PhoneMockupScreen screenId={slide.screenId} color={slide.color} />
+        </div>
+      </div>
+      {/* Description */}
+      <div className="flex-1">
+        <h2 className={`text-3xl font-black mb-2 bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+          {slide.title}
+        </h2>
+        <p className="text-white/50 text-sm mb-6">{slide.subtitle}</p>
+        <div className="space-y-3">
+          {slide.highlights.map((h, i) => (
+            <motion.div key={i}
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.12 }}
+              className="flex items-start gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+              <div className="w-2 h-2 rounded-full mt-1 shrink-0" style={{ background: slide.color }} />
+              <div>
+                <p className="font-bold text-white text-sm">{h.label}</p>
+                <p className="text-white/50 text-xs">{h.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );
