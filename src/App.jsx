@@ -42,6 +42,7 @@ import BookClubs from '@/pages/BookClubs';
 import UserProfile from '@/pages/UserProfile';
 import SeriesPage from '@/pages/Series';
 import Bookmarks from '@/pages/Bookmarks';
+import Presentation from '@/pages/Presentation';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -104,6 +105,7 @@ const AuthenticatedApp = () => {
           <Route path="/user/:email" element={<UserProfile />} />
           <Route path="/series" element={<SeriesPage />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="/presentation" element={<Presentation />} />
         </Route>
 
         {/* Reader - no layout for immersive experience */}

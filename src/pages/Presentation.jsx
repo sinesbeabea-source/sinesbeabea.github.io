@@ -1,0 +1,375 @@
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Download, X, BookOpen, Users, Heart, Mic, Star, Coins, Sparkles, MessageCircle, Library, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+const slides = [
+  {
+    id: 1,
+    type: 'cover',
+    title: 'BookMatch AI',
+    subtitle: 'แพลตฟอร์มอ่านนิยายอัจฉริยะ\nที่จับคู่นักอ่านด้วย AI',
+    emoji: '📚',
+    gradient: 'from-[#FF85C2] via-[#c084fc] to-[#85FFD4]',
+    bg: 'from-slate-950 via-purple-950 to-slate-900',
+  },
+  {
+    id: 2,
+    type: 'problem',
+    title: 'ปัญหาของนักอ่าน',
+    points: [
+      { icon: '😔', text: 'อ่านหนังสือคนเดียว ไม่มีคนคุยด้วย' },
+      { icon: '🔍', text: 'หาหนังสือที่ใช่ยาก ไม่รู้จะเริ่มอ่านอะไร' },
+      { icon: '💬', text: 'ขาดชุมชนนักอ่านที่แชร์ความสนใจเดียวกัน' },
+      { icon: '📖', text: 'ไม่มีระบบติดตามการอ่านที่สะดวก' },
+    ],
+    gradient: 'from-rose-500 to-orange-500',
+    bg: 'from-slate-950 to-slate-900',
+  },
+  {
+    id: 3,
+    type: 'solution',
+    title: 'BookMatch AI คือคำตอบ',
+    subtitle: 'แพลตฟอร์มครบวงจรสำหรับนักอ่านยุคใหม่',
+    features: [
+      { icon: Heart, label: 'จับคู่นักอ่าน', desc: 'AI หาคู่อ่านที่ใช่สำหรับคุณ', color: 'text-pink-400' },
+      { icon: BookOpen, label: 'ห้องสมุดดิจิทัล', desc: 'นิยายหลากหลายแนว', color: 'text-cyan-400' },
+      { icon: MessageCircle, label: 'แชทเรียลไทม์', desc: 'คุยกับคู่อ่านได้ทันที', color: 'text-green-400' },
+      { icon: Users, label: 'ชุมชนนักอ่าน', desc: 'รีวิว แชร์ ถกเถียง', color: 'text-purple-400' },
+    ],
+    gradient: 'from-[#FF85C2] to-[#85FFD4]',
+    bg: 'from-slate-950 to-purple-950',
+  },
+  {
+    id: 4,
+    type: 'feature-detail',
+    title: 'ระบบจับคู่อัจฉริยะ',
+    subtitle: 'AI วิเคราะห์แนวหนังสือ อารมณ์ และสไตล์การอ่าน\nเพื่อหาคู่อ่านที่เข้ากันได้มากที่สุด',
+    stats: [
+      { value: '95%', label: 'ความแม่นยำการจับคู่' },
+      { value: '<3s', label: 'เวลาในการหาคู่' },
+      { value: '50+', label: 'แนวหนังสือ' },
+    ],
+    emoji: '💘',
+    gradient: 'from-pink-500 to-rose-500',
+    bg: 'from-slate-950 to-pink-950',
+  },
+  {
+    id: 5,
+    type: 'feature-detail',
+    title: 'อ่านด้วยกัน (Read Together)',
+    subtitle: 'ซิงค์บทอ่านกับคู่แบบเรียลไทม์\nคุยโทรหากันระหว่างอ่านได้เลย',
+    stats: [
+      { value: '🔄', label: 'Sync บทพร้อมกัน' },
+      { value: '📞', label: 'Voice Call ในตัว' },
+      { value: '💬', label: 'แชทระหว่างอ่าน' },
+    ],
+    emoji: '👥',
+    gradient: 'from-cyan-500 to-blue-500',
+    bg: 'from-slate-950 to-blue-950',
+  },
+  {
+    id: 6,
+    type: 'feature-detail',
+    title: 'เขียนนิยายของตัวเอง',
+    subtitle: 'เครื่องมือเขียนนิยายพร้อม AI ช่วยเขียน\nสร้างรายได้จากนิยายของคุณด้วยระบบ Coin',
+    stats: [
+      { value: '✍️', label: 'Editor ในตัว' },
+      { value: '🤖', label: 'AI ช่วยเขียน' },
+      { value: '💰', label: 'ระบบ Premium' },
+    ],
+    emoji: '📝',
+    gradient: 'from-yellow-500 to-orange-500',
+    bg: 'from-slate-950 to-orange-950',
+  },
+  {
+    id: 7,
+    type: 'features-grid',
+    title: 'ฟีเจอร์ครบครัน',
+    items: [
+      { icon: Library, label: 'ห้องสมุด', desc: 'จัดการรายการอ่าน' },
+      { icon: Sparkles, label: 'AI แนะนำ', desc: 'แนะนำหนังสือส่วนตัว' },
+      { icon: Star, label: 'รีวิว', desc: 'ให้คะแนนและวิจารณ์' },
+      { icon: Coins, label: 'ระบบ Coin', desc: 'ซื้อบทพรีเมียม' },
+      { icon: Mic, label: 'Text-to-Speech', desc: 'ฟังนิยายได้เลย' },
+      { icon: Zap, label: 'Highlight', desc: 'บันทึกข้อความโปรด' },
+    ],
+    gradient: 'from-[#FF85C2] to-[#c084fc]',
+    bg: 'from-slate-950 to-slate-900',
+  },
+  {
+    id: 8,
+    type: 'cta',
+    title: 'เริ่มต้นการอ่านที่ดีกว่า',
+    subtitle: 'เข้าร่วม BookMatch AI วันนี้\nพบคู่อ่านและนิยายที่ใช่สำหรับคุณ',
+    emoji: '🚀',
+    gradient: 'from-[#FF85C2] via-[#c084fc] to-[#85FFD4]',
+    bg: 'from-slate-950 via-purple-950 to-slate-900',
+  },
+];
+
+const slideVariants = {
+  enter: (dir) => ({ x: dir > 0 ? 600 : -600, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir) => ({ x: dir > 0 ? -600 : 600, opacity: 0 }),
+};
+
+export default function Presentation() {
+  const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [exporting, setExporting] = useState(false);
+  const presentRef = useRef(null);
+
+  const goTo = (idx) => {
+    setDirection(idx > current ? 1 : -1);
+    setCurrent(idx);
+  };
+
+  const prev = () => current > 0 && goTo(current - 1);
+  const next = () => current < slides.length - 1 && goTo(current + 1);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+  };
+
+  const exportPDF = async () => {
+    setExporting(true);
+    try {
+      const { jsPDF } = await import('jspdf');
+      const { default: html2canvas } = await import('html2canvas');
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [960, 540] });
+
+      for (let i = 0; i < slides.length; i++) {
+        goTo(i);
+        await new Promise(r => setTimeout(r, 600));
+        const el = document.getElementById('slide-content');
+        if (!el) continue;
+        const canvas = await html2canvas(el, { scale: 1.5, useCORS: true, backgroundColor: null });
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, 0, 960, 540);
+      }
+      pdf.save('BookMatch-AI-Presentation.pdf');
+      goTo(0);
+    } catch (e) {
+      console.error(e);
+    }
+    setExporting(false);
+  };
+
+  const slide = slides[current];
+
+  return (
+    <div
+      className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 select-none"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      ref={presentRef}
+    >
+      {/* Top bar */}
+      <div className="w-full max-w-4xl flex justify-between items-center mb-4">
+        <a href="/" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 text-sm">
+          <X className="w-4 h-4" /> ปิด
+        </a>
+        <span className="text-xs text-muted-foreground">{current + 1} / {slides.length}</span>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={exportPDF}
+          disabled={exporting}
+          className="gap-2 text-xs"
+        >
+          <Download className="w-3 h-3" />
+          {exporting ? 'กำลัง Export...' : 'Export PDF'}
+        </Button>
+      </div>
+
+      {/* Slide */}
+      <div className="w-full max-w-4xl aspect-video relative overflow-hidden rounded-2xl shadow-2xl" style={{ boxShadow: '0 0 60px hsl(330 100% 72% / 0.2)' }}>
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={slide.id}
+            id="slide-content"
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+            className={`absolute inset-0 bg-gradient-to-br ${slide.bg} flex flex-col items-center justify-center p-10 overflow-hidden`}
+          >
+            {/* Background decoration */}
+            <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} opacity-5`} />
+            <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-10"
+              style={{ background: 'hsl(330 100% 72%)' }} />
+            <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-10"
+              style={{ background: 'hsl(160 80% 60%)' }} />
+
+            <SlideContent slide={slide} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center gap-4 mt-6">
+        <button
+          onClick={prev}
+          disabled={current === 0}
+          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center transition-all"
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Dots */}
+        <div className="flex gap-2">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className={`rounded-full transition-all ${i === current ? 'w-6 h-2 bg-primary' : 'w-2 h-2 bg-white/30 hover:bg-white/50'}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={next}
+          disabled={current === slides.length - 1}
+          className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 flex items-center justify-center transition-all"
+        >
+          <ChevronRight className="w-5 h-5 text-white" />
+        </button>
+      </div>
+
+      <p className="text-xs text-muted-foreground mt-3 opacity-50">กด ← → หรือคลิกลูกศรเพื่อเปลี่ยนสไลด์</p>
+    </div>
+  );
+}
+
+function SlideContent({ slide }) {
+  if (slide.type === 'cover') return (
+    <div className="relative z-10 text-center">
+      <div className="text-7xl mb-4 kawaii-bounce inline-block">{slide.emoji}</div>
+      <h1 className={`text-6xl font-black mb-3 bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h1>
+      <p className="text-xl text-white/70 whitespace-pre-line leading-relaxed">{slide.subtitle}</p>
+    </div>
+  );
+
+  if (slide.type === 'problem') return (
+    <div className="relative z-10 w-full">
+      <h2 className={`text-4xl font-black mb-8 text-center bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <div className="grid grid-cols-2 gap-4">
+        {slide.points.map((p, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="flex items-center gap-3 bg-white/5 rounded-xl p-4 border border-white/10"
+          >
+            <span className="text-3xl">{p.icon}</span>
+            <p className="text-white/80 text-sm leading-snug">{p.text}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'solution') return (
+    <div className="relative z-10 w-full text-center">
+      <h2 className={`text-4xl font-black mb-2 bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <p className="text-white/60 mb-8 text-sm">{slide.subtitle}</p>
+      <div className="grid grid-cols-4 gap-4">
+        {slide.features.map((f, i) => {
+          const Icon = f.icon;
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white/5 rounded-2xl p-5 border border-white/10 flex flex-col items-center gap-2"
+            >
+              <Icon className={`w-8 h-8 ${f.color}`} />
+              <p className="font-bold text-white text-sm">{f.label}</p>
+              <p className="text-white/50 text-xs">{f.desc}</p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'feature-detail') return (
+    <div className="relative z-10 text-center">
+      <div className="text-6xl mb-4">{slide.emoji}</div>
+      <h2 className={`text-4xl font-black mb-3 bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <p className="text-white/60 mb-8 whitespace-pre-line text-sm leading-relaxed">{slide.subtitle}</p>
+      <div className="flex justify-center gap-8">
+        {slide.stats.map((s, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.15 }}
+            className="bg-white/5 rounded-2xl px-8 py-5 border border-white/10"
+          >
+            <div className="text-3xl font-black text-white mb-1">{s.value}</div>
+            <div className="text-white/50 text-xs">{s.label}</div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'features-grid') return (
+    <div className="relative z-10 w-full">
+      <h2 className={`text-4xl font-black mb-6 text-center bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <div className="grid grid-cols-3 gap-3">
+        {slide.items.map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.08 }}
+              className="flex items-center gap-3 bg-white/5 rounded-xl p-4 border border-white/10"
+            >
+              <Icon className="w-6 h-6 text-primary shrink-0" />
+              <div>
+                <p className="font-bold text-white text-sm">{item.label}</p>
+                <p className="text-white/50 text-xs">{item.desc}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'cta') return (
+    <div className="relative z-10 text-center">
+      <div className="text-7xl mb-5 kawaii-bounce inline-block">{slide.emoji}</div>
+      <h2 className={`text-5xl font-black mb-4 bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <p className="text-white/70 text-lg whitespace-pre-line leading-relaxed mb-8">{slide.subtitle}</p>
+      <div className={`inline-block px-8 py-3 rounded-full bg-gradient-to-r ${slide.gradient} text-slate-900 font-black text-lg shadow-lg`}>
+        BookMatch AI ✨
+      </div>
+    </div>
+  );
+
+  return null;
+}

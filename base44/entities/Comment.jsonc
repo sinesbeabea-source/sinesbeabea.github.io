@@ -1,0 +1,21 @@
+{
+  "name": "Comment",
+  "type": "object",
+  "properties": {
+    "post_id": {
+      "type": "string",
+      "description": "Reference to CommunityPost"
+    },
+    "content": {
+      "type": "string"
+    },
+    "like_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "post_id",
+    "content"
+  ]
+}
