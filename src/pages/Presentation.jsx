@@ -99,6 +99,52 @@ const slides = [
   },
   {
     id: 8,
+    type: 'page-tour',
+    title: 'ทัวร์หน้าเว็บ',
+    subtitle: 'แต่ละหน้าออกแบบมาเพื่อประสบการณ์นักอ่านที่ดีที่สุด',
+    pages: [
+      {
+        emoji: '🏠',
+        name: 'หน้าแรก (Home)',
+        color: '#FF85C2',
+        features: ['แนะนำหนังสือ Featured', 'Trending & New releases', 'Quick access ไปทุกฟีเจอร์'],
+      },
+      {
+        emoji: '🔍',
+        name: 'ค้นหา (Discover)',
+        color: '#85FFD4',
+        features: ['ค้นหาหนังสือด้วย Keyword', 'Filter ตามแนว/อารมณ์/Rating', 'AI แนะนำส่วนตัว'],
+      },
+      {
+        emoji: '💘',
+        name: 'จับคู่ (Matching)',
+        color: '#c084fc',
+        features: ['เลือกหนังสือที่กำลังอ่าน', 'AI จับคู่กับนักอ่านคนอื่น', 'แชท + โทรหากันได้เลย'],
+      },
+      {
+        emoji: '📖',
+        name: 'อ่านหนังสือ (Reader)',
+        color: '#60a5fa',
+        features: ['Reader ปรับ font/theme ได้', 'Highlight & Bookmark', 'Text-to-Speech ในตัว'],
+      },
+      {
+        emoji: '✍️',
+        name: 'เขียนนิยาย (Write)',
+        color: '#fbbf24',
+        features: ['Editor เขียนบทได้เลย', 'AI ช่วยสร้าง Content', 'ตั้งราคา Premium Chapter'],
+      },
+      {
+        emoji: '👥',
+        name: 'ชุมชน (Community)',
+        color: '#34d399',
+        features: ['โพสต์รีวิว/ถกเถียง', 'Follow นักอ่านคนอื่น', 'Book Clubs กลุ่มอ่านร่วม'],
+      },
+    ],
+    gradient: 'from-[#FF85C2] to-[#c084fc]',
+    bg: 'from-slate-950 to-purple-950',
+  },
+  {
+    id: 9,
     type: 'cta',
     title: 'เริ่มต้นการอ่านที่ดีกว่า',
     subtitle: 'เข้าร่วม BookMatch AI วันนี้\nพบคู่อ่านและนิยายที่ใช่สำหรับคุณ',
@@ -264,6 +310,24 @@ export default function Presentation() {
                 <p style="font-weight:700;color:#fff;font-size:14px;margin:0;">${item.label}</p>
                 <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">${item.desc}</p>
               </div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    if (s.type === 'page-tour') return `
+      <div style="width:100%;">
+        <h2 style="font-size:32px;font-weight:900;text-align:center;margin:0 0 4px;">${textGrad(s.title)}</h2>
+        <p style="color:rgba(255,255,255,0.5);font-size:12px;text-align:center;margin:0 0 20px;">${s.subtitle}</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          ${s.pages.map(p => `
+            <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-top:3px solid ${p.color};border-radius:16px;padding:16px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <span style="font-size:22px;">${p.emoji}</span>
+                <span style="font-weight:700;color:#fff;font-size:13px;">${p.name}</span>
+              </div>
+              <ul style="list-style:none;padding:0;margin:0;">
+                ${p.features.map(f => `<li style="color:rgba(255,255,255,0.6);font-size:11px;margin-bottom:4px;"><span style="color:${p.color};">▸</span> ${f}</li>`).join('')}
+              </ul>
             </div>`).join('')}
         </div>
       </div>`;
@@ -475,6 +539,40 @@ function SlideContent({ slide }) {
             </motion.div>
           );
         })}
+      </div>
+    </div>
+  );
+
+  if (slide.type === 'page-tour') return (
+    <div className="relative z-10 w-full">
+      <h2 className={`text-3xl font-black mb-1 text-center bg-gradient-to-r ${slide.gradient} bg-clip-text text-transparent`}>
+        {slide.title}
+      </h2>
+      <p className="text-white/50 text-xs text-center mb-5">{slide.subtitle}</p>
+      <div className="grid grid-cols-3 gap-3">
+        {slide.pages.map((p, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
+            className="bg-white/5 border border-white/10 rounded-2xl p-4"
+            style={{ borderTop: `3px solid ${p.color}` }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-2xl">{p.emoji}</span>
+              <span className="font-bold text-white text-sm">{p.name}</span>
+            </div>
+            <ul className="space-y-1">
+              {p.features.map((f, j) => (
+                <li key={j} className="text-white/60 text-xs flex items-start gap-1.5">
+                  <span style={{ color: p.color }} className="mt-0.5 shrink-0">▸</span>
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
