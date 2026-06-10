@@ -204,6 +204,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
   const [showAfterChat, setShowAfterChat] = useState(false);
   const [showReadTogether, setShowReadTogether] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
+  const [callDismissed, setCallDismissed] = useState(false);
   const messagesEndRef = useRef(null);
 
   const roomName = user?.email && buddyEmail
@@ -231,7 +232,16 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
   const callStatus = matchRecord?.call_status || 'idle';
   const buddyCallStatus = buddyMatchRecord?.call_status || 'idle';
   const isIncomingCall = buddyCallStatus === 'calling' && buddyMatchRecord?.call_initiated_by === buddyEmail;
-  const showCall = callStatus === 'calling' || callStatus === 'in_call' || isIncomingCall;
+  const isCallActive = callStatus === 'calling' || callStatus === 'in_call' || isIncomingCall;
+  // Reset dismissed flag when a genuinely new call starts
+  const prevCallActiveRef = useRef(false);
+  useEffect(() => {
+    if (isCallActive && !prevCallActiveRef.current) {
+      setCallDismissed(false);
+    }
+    prevCallActiveRef.current = isCallActive;
+  }, [isCallActive]);
+  const showCall = isCallActive && !callDismissed;
 
   // Get or create chat room
   const { data: chatRoom } = useQuery({
@@ -318,6 +328,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
   };
 
   const handleEndCall = async () => {
+    setCallDismissed(true);
     await syncBothSides({ call_status: 'idle', call_initiated_by: null });
   };
 
