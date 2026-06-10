@@ -77,6 +77,9 @@ const AuthenticatedApp = () => {
       <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected routes with layout */}
+      {/* Public routes */}
+      <Route path="/presentation" element={<Presentation />} />
+
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Home />} />
@@ -106,7 +109,6 @@ const AuthenticatedApp = () => {
           <Route path="/user/:email" element={<UserProfile />} />
           <Route path="/series" element={<SeriesPage />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
-          <Route path="/presentation" element={<Presentation />} />
           <Route path="/friends" element={<Friends />} />
         </Route>
 
