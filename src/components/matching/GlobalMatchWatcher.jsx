@@ -18,13 +18,14 @@ export default function GlobalMatchWatcher() {
   const [chatPopup, setChatPopup] = useState(null);
   const [minimized, setMinimized] = useState(false);
   const chatPopupRef = useRef(null);
+  const minimizedRef = useRef(false);
   const processingRef = useRef(false);
   const lastSyncRef = useRef(null);
+  const shownMatchIds = useRef(new Set()); // Track which matches we've already shown
 
-  // Keep ref in sync with state
-  useEffect(() => {
-    chatPopupRef.current = chatPopup;
-  }, [chatPopup]);
+  // Keep refs in sync with state
+  useEffect(() => { chatPopupRef.current = chatPopup; }, [chatPopup]);
+  useEffect(() => { minimizedRef.current = minimized; }, [minimized]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -35,7 +36,6 @@ export default function GlobalMatchWatcher() {
       try {
         const current = chatPopupRef.current;
 
-        // Single query: fetch all my accepted matches
         const allAccepted = await base44.entities.ReaderMatch.filter({
           user_email: user.email,
           status: 'accepted',
@@ -47,20 +47,28 @@ export default function GlobalMatchWatcher() {
           if (!live) {
             setChatPopup(null);
             setMinimized(false);
+            shownMatchIds.current.delete(current.matchId);
+          }
+          // Still check for sync_active even while popup is open
+          const syncMatch = allAccepted.find(m => m.id === current.matchId && m.sync_active && m.sync_chapter_id);
+          if (syncMatch && lastSyncRef.current !== syncMatch.sync_chapter_id) {
+            lastSyncRef.current = syncMatch.sync_chapter_id;
+            navigate(`/read/${syncMatch.sync_book_id}/${syncMatch.sync_chapter_id}`);
           }
           return;
         }
 
-        // 2) New match not yet shown
-        const newMatch = allAccepted.find(m => !m.popup_opened);
+        // 2) New match not yet shown — only show once per matchId
+        const newMatch = allAccepted.find(m => !m.popup_opened && !shownMatchIds.current.has(m.id));
         if (newMatch) {
+          shownMatchIds.current.add(newMatch.id);
           await base44.entities.ReaderMatch.update(newMatch.id, { popup_opened: true });
           setChatPopup({ matchId: newMatch.id, buddyEmail: newMatch.matched_email, bookTitle: newMatch.book_title });
           setMinimized(false);
           return;
         }
 
-        // 3) Check for sync_active — buddy wants to read together
+        // 3) Check for sync_active when no popup active
         const syncMatch = allAccepted.find(m => m.sync_active && m.sync_chapter_id);
         if (syncMatch && lastSyncRef.current !== syncMatch.sync_chapter_id) {
           lastSyncRef.current = syncMatch.sync_chapter_id;
@@ -68,14 +76,14 @@ export default function GlobalMatchWatcher() {
           return;
         }
 
-        // 4) Restore popup after page refresh
-        const existing = allAccepted.find(m => m.popup_opened);
+        // 4) Restore minimized bubble after page refresh (only if not already shown)
+        const existing = allAccepted.find(m => m.popup_opened && !shownMatchIds.current.has(m.id));
         if (existing) {
+          shownMatchIds.current.add(existing.id);
           setChatPopup({ matchId: existing.id, buddyEmail: existing.matched_email, bookTitle: existing.book_title });
           setMinimized(true);
         }
       } catch (err) {
-        // Silently ignore rate limit errors — next interval will retry
         if (!err?.message?.includes('Rate limit')) {
           console.error('GlobalMatchWatcher error:', err);
         }
@@ -85,7 +93,7 @@ export default function GlobalMatchWatcher() {
     };
 
     check();
-    const interval = setInterval(check, 60000);
+    const interval = setInterval(check, 15000); // Poll every 15s (faster)
     return () => clearInterval(interval);
   }, [user?.email]);
 

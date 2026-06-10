@@ -41,6 +41,7 @@ function AfterChatPopup({ matchedEmail, onClose }) {
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[90] bg-background/60 backdrop-blur-md flex items-center justify-center px-4"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
     >
       <motion.div
         initial={{ scale: 0.85, opacity: 0, y: 30 }}
@@ -74,7 +75,7 @@ function AfterChatPopup({ matchedEmail, onClose }) {
             </Button>
           </Link>
           <Button variant="ghost" onClick={onClose} className="text-muted-foreground rounded-full">
-            ไม่ ขอบคุณ
+            ปิด
           </Button>
         </div>
       </motion.div>
@@ -380,6 +381,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     >
       <motion.div
         initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
+        onClick={e => e.stopPropagation()}
         className="relative w-full sm:max-w-md bg-card border border-border/50 rounded-t-3xl sm:rounded-2xl flex flex-col shadow-2xl overflow-hidden"
         style={{ height: '75vh' }}
       >
@@ -397,7 +399,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
         </AnimatePresence>
 
         {/* Read together overlay */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {showReadTogether && (
             <ReadTogetherPanel
               matchId={matchId}

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/lib/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Users, BookOpen, Search, Radio, X, ChevronRight, Clock, Heart
+  Users, BookOpen, Search, Radio, X, ChevronRight, Clock, Heart, XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -172,18 +172,15 @@ export default function Matching() {
       matched_email: buddy.user_email,
     });
 
-    // Only skip if there's already an active pending like (not yet responded)
     const activeRecord = existing.find(r => r.status === 'liked' || r.status === 'accepted');
     if (activeRecord) {
       setLikedEmails(prev => new Set([...prev, buddy.user_email]));
       return;
     }
 
-    // Delete ALL old records with this buddy to fully reset history, then create fresh
     for (const r of existing) {
       await base44.entities.ReaderMatch.delete(r.id);
     }
-    // Also delete buddy's old records toward me (reset both sides)
     const buddyOldRecords = await base44.entities.ReaderMatch.filter({
       user_email: buddy.user_email,
       matched_email: user?.email,
@@ -203,7 +200,6 @@ export default function Matching() {
       book_title: selectedBook?.title,
     });
 
-    // Notify the buddy
     await base44.entities.Notification.create({
       user_email: buddy.user_email,
       type: 'match',
@@ -214,6 +210,23 @@ export default function Matching() {
     });
 
     setLikedEmails(prev => new Set([...prev, buddy.user_email]));
+  };
+
+  const handleSkip = async (buddy) => {
+    const existing = await base44.entities.ReaderMatch.filter({
+      user_email: user?.email,
+      matched_email: buddy.user_email,
+    });
+    if (existing.some(r => r.status === 'liked' || r.status === 'accepted')) return;
+    await base44.entities.ReaderMatch.create({
+      user_email: user?.email,
+      matched_email: buddy.user_email,
+      status: 'skipped',
+      book_id: selectedBook?.id,
+      book_title: selectedBook?.title,
+    });
+    // Hide from list
+    setLikedEmails(prev => new Set([...prev, `skip:${buddy.user_email}`]));
   };
 
   return (
@@ -263,7 +276,7 @@ export default function Matching() {
 
               {/* Buddy list with like button */}
               <AnimatePresence>
-                {activeSessions?.map(s => {
+                {activeSessions?.filter(s => !likedEmails.has(`skip:${s.user_email}`)).map(s => {
                   const liked = likedEmails.has(s.user_email);
                   return (
                     <motion.div
@@ -285,18 +298,31 @@ export default function Matching() {
                           <span className="text-xs text-green-400">ออนไลน์อยู่</span>
                         </div>
                       </div>
-                      <Button
-                        size="sm"
-                        onClick={() => !liked && handleLike(s)}
-                        className={`gap-1 h-8 text-xs shrink-0 rounded-full transition-all ${
-                          liked
-                            ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 cursor-default'
-                            : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white'
-                        }`}
-                      >
-                        <Heart className={`w-3 h-3 ${liked ? 'fill-rose-400' : ''}`} />
-                        {liked ? 'กดใจแล้ว' : 'กดใจ'}
-                      </Button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {!liked && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleSkip(s)}
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive rounded-full"
+                            title="ปฏิเสธ"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          onClick={() => !liked && handleLike(s)}
+                          className={`gap-1 h-8 text-xs rounded-full transition-all ${
+                            liked
+                              ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 cursor-default'
+                              : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white'
+                          }`}
+                        >
+                          <Heart className={`w-3 h-3 ${liked ? 'fill-rose-400' : ''}`} />
+                          {liked ? 'กดใจแล้ว' : 'กดใจ'}
+                        </Button>
+                      </div>
                     </motion.div>
                   );
                 })}
