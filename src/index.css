@@ -9,75 +9,75 @@
     --font-inter: 'Nunito', 'Sarabun', sans-serif;
     --font-space: 'Nunito', 'Sarabun', sans-serif;
 
-    /* Kawaii Dark Cute — navy base, pink + mint accents */
-    --background: 240 35% 10%;
-    --foreground: 300 20% 95%;
-    --card: 240 30% 14%;
-    --card-foreground: 300 20% 95%;
-    --popover: 240 30% 14%;
-    --popover-foreground: 300 20% 95%;
-    --primary: 330 100% 72%;
+    /* Pastel Latte — warm cream base, rose + lavender accents */
+    --background: 30 40% 97%;
+    --foreground: 260 25% 22%;
+    --card: 0 0% 100%;
+    --card-foreground: 260 25% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 25% 22%;
+    --primary: 340 80% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 28% 20%;
-    --secondary-foreground: 300 20% 88%;
-    --muted: 240 25% 18%;
-    --muted-foreground: 260 15% 58%;
-    --accent: 160 80% 60%;
-    --accent-foreground: 240 35% 10%;
-    --destructive: 0 72% 60%;
+    --secondary: 280 40% 94%;
+    --secondary-foreground: 260 25% 35%;
+    --muted: 30 30% 93%;
+    --muted-foreground: 260 15% 52%;
+    --accent: 270 60% 72%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 255 25% 22%;
-    --input: 255 25% 22%;
-    --ring: 330 100% 72%;
-    --chart-1: 330 100% 72%;
-    --chart-2: 160 80% 60%;
-    --chart-3: 280 80% 70%;
-    --chart-4: 200 100% 65%;
-    --chart-5: 50 100% 65%;
+    --border: 280 30% 88%;
+    --input: 280 30% 88%;
+    --ring: 340 80% 65%;
+    --chart-1: 340 80% 65%;
+    --chart-2: 270 60% 72%;
+    --chart-3: 200 70% 65%;
+    --chart-4: 150 60% 55%;
+    --chart-5: 40 90% 65%;
     --radius: 1rem;
-    --sidebar-background: 240 35% 8%;
-    --sidebar-foreground: 300 20% 90%;
-    --sidebar-primary: 330 100% 72%;
+    --sidebar-background: 30 40% 95%;
+    --sidebar-foreground: 260 25% 28%;
+    --sidebar-primary: 340 80% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 30% 16%;
-    --sidebar-accent-foreground: 300 20% 88%;
-    --sidebar-border: 255 25% 20%;
-    --sidebar-ring: 330 100% 72%;
+    --sidebar-accent: 280 40% 90%;
+    --sidebar-accent-foreground: 260 25% 35%;
+    --sidebar-border: 280 30% 85%;
+    --sidebar-ring: 340 80% 65%;
   }
 
   .dark {
-    --background: 240 35% 10%;
-    --foreground: 300 20% 95%;
-    --card: 240 30% 14%;
-    --card-foreground: 300 20% 95%;
-    --popover: 240 30% 14%;
-    --popover-foreground: 300 20% 95%;
-    --primary: 330 100% 72%;
+    --background: 30 40% 97%;
+    --foreground: 260 25% 22%;
+    --card: 0 0% 100%;
+    --card-foreground: 260 25% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 25% 22%;
+    --primary: 340 80% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 28% 20%;
-    --secondary-foreground: 300 20% 88%;
-    --muted: 240 25% 18%;
-    --muted-foreground: 260 15% 58%;
-    --accent: 160 80% 60%;
-    --accent-foreground: 240 35% 10%;
-    --destructive: 0 72% 60%;
+    --secondary: 280 40% 94%;
+    --secondary-foreground: 260 25% 35%;
+    --muted: 30 30% 93%;
+    --muted-foreground: 260 15% 52%;
+    --accent: 270 60% 72%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 255 25% 22%;
-    --input: 255 25% 22%;
-    --ring: 330 100% 72%;
-    --chart-1: 330 100% 72%;
-    --chart-2: 160 80% 60%;
-    --chart-3: 280 80% 70%;
-    --chart-4: 200 100% 65%;
-    --chart-5: 50 100% 65%;
-    --sidebar-background: 240 35% 8%;
-    --sidebar-foreground: 300 20% 90%;
-    --sidebar-primary: 330 100% 72%;
+    --border: 280 30% 88%;
+    --input: 280 30% 88%;
+    --ring: 340 80% 65%;
+    --chart-1: 340 80% 65%;
+    --chart-2: 270 60% 72%;
+    --chart-3: 200 70% 65%;
+    --chart-4: 150 60% 55%;
+    --chart-5: 40 90% 65%;
+    --sidebar-background: 30 40% 95%;
+    --sidebar-foreground: 260 25% 28%;
+    --sidebar-primary: 340 80% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 30% 16%;
-    --sidebar-accent-foreground: 300 20% 88%;
-    --sidebar-border: 255 25% 20%;
-    --sidebar-ring: 330 100% 72%;
+    --sidebar-accent: 280 40% 90%;
+    --sidebar-accent-foreground: 260 25% 35%;
+    --sidebar-border: 280 30% 85%;
+    --sidebar-ring: 340 80% 65%;
   }
 }
 
@@ -99,30 +99,30 @@
     @apply hover:bg-card/90 hover:border-primary/40 transition-all duration-300;
   }
   .neon-glow {
-    box-shadow: 0 0 24px hsl(330 100% 72% / 0.25), 0 0 48px hsl(330 100% 72% / 0.08), 0 4px 24px hsl(240 35% 5% / 0.6);
+    box-shadow: 0 0 24px hsl(340 80% 65% / 0.2), 0 0 48px hsl(340 80% 65% / 0.08), 0 4px 24px hsl(280 30% 80% / 0.4);
   }
   .neon-glow-accent {
-    box-shadow: 0 0 24px hsl(160 80% 60% / 0.25), 0 0 48px hsl(160 80% 60% / 0.08);
+    box-shadow: 0 0 24px hsl(270 60% 72% / 0.25), 0 0 48px hsl(270 60% 72% / 0.1);
   }
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
   .gradient-border {
-    border-image: linear-gradient(to right, hsl(330 100% 72%), hsl(160 80% 60%)) 1;
+    border-image: linear-gradient(to right, hsl(340 80% 65%), hsl(270 60% 72%)) 1;
   }
   .kawaii-btn {
     @apply rounded-full font-bold transition-all duration-200 active:scale-95;
-    background: linear-gradient(135deg, #FF85C2, #85FFD4);
-    color: #1a1033;
-    box-shadow: 0 4px 16px hsl(330 100% 72% / 0.35);
+    background: linear-gradient(135deg, #f9a8c9, #c4b5fd);
+    color: #fff;
+    box-shadow: 0 4px 16px hsl(340 80% 65% / 0.3);
   }
   .kawaii-btn:hover {
-    box-shadow: 0 6px 24px hsl(330 100% 72% / 0.5);
+    box-shadow: 0 6px 24px hsl(340 80% 65% / 0.45);
     transform: translateY(-1px);
   }
   .card-cute {
-    @apply bg-card/80 backdrop-blur-xl border border-primary/20 rounded-2xl;
-    box-shadow: 0 4px 32px hsl(240 35% 5% / 0.5), inset 0 1px 0 hsl(330 100% 72% / 0.08);
+    @apply bg-card/90 backdrop-blur-xl border border-primary/15 rounded-2xl;
+    box-shadow: 0 4px 24px hsl(280 30% 70% / 0.15), inset 0 1px 0 hsl(340 80% 65% / 0.06);
   }
 }
 
@@ -131,14 +131,14 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(240 35% 10%);
+  background: hsl(30 40% 95%);
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(330 100% 72% / 0.35);
+  background: hsl(340 80% 65% / 0.35);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(330 100% 72% / 0.6);
+  background: hsl(340 80% 65% / 0.6);
 }
 
 /* Kawaii bounce animation */
