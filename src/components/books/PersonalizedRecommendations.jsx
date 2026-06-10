@@ -86,10 +86,16 @@ export default function PersonalizedRecommendations() {
     const reasonMap = {};
     (result.recommendations || []).forEach(r => { reasonMap[r.book_id] = r.reason; });
 
-    const recBooks = allBooks.filter(b => recIds.includes(b.id)).map(b => ({
+    let recBooks = allBooks.filter(b => recIds.includes(b.id)).map(b => ({
       ...b,
       reason: reasonMap[b.id] || '',
     }));
+
+    // Fallback: ถ้า AI หาไม่เจอ ให้แสดงหนังสือยอดนิยม (rating สูงสุด)
+    if (recBooks.length === 0) {
+      const fallback = await base44.entities.Book.filter({ status: 'published' }, '-read_count', 6);
+      recBooks = fallback.map(b => ({ ...b, reason: 'หนังสือยอดนิยมที่นักอ่านส่วนใหญ่ชื่นชอบ ✨' }));
+    }
 
     setRecommendations(recBooks);
     setLoading(false);
