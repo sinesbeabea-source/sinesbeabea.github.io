@@ -243,6 +243,7 @@ export default function Home() {
       <StatsBar />
       <BookSection title="กำลังนิยม" icon={TrendingUp} books={trendingBooks} loading={trendingLoading} linkTo="/discover" delay={0.3} />
       <PersonalizedRecommendations />
+      <BookSection title="หนังสือยอดนิยม" icon={Star} books={trendingBooks} loading={trendingLoading} linkTo="/discover" delay={0.35} />
       <WriteBanner />
       <BookSection title="เพิ่มล่าสุด" icon={BookOpen} books={recentBooks} loading={recentLoading} linkTo="/discover" delay={0.5} />
     </div>
