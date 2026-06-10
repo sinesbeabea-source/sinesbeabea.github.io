@@ -222,25 +222,22 @@ function WriteBanner() {
 export default function Home() {
   const { user } = useAuth();
 
-  const { data: trendingBooks, isLoading: trendingLoading } = useQuery({
+  const { data: trendingBooks = [], isLoading: trendingLoading } = useQuery({
     queryKey: ['trending-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-read_count', 10),
-    initialData: [],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
-  const { data: recentBooks, isLoading: recentLoading } = useQuery({
+  const { data: recentBooks = [], isLoading: recentLoading } = useQuery({
     queryKey: ['recent-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-created_date', 10),
-    initialData: [],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
-  const { data: topRatedBooks, isLoading: topRatedLoading } = useQuery({
+  const { data: topRatedBooks = [], isLoading: topRatedLoading } = useQuery({
     queryKey: ['top-rated-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-rating', 10),
-    initialData: [],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   return (
