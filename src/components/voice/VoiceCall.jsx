@@ -47,36 +47,36 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
     await base44.entities.ChatMessage.create({
       room_id: sigRoom(),
       sender_email: user?.email,
-      sender_name: type,          // abuse sender_name as signal type tag
+      sender_name: type,
       content: JSON.stringify(payload),
       message_type: 'system',
     });
   };
 
+  // Poll for a specific signal type from the buddy (not from ourselves)
   const pollSignal = (type, callback) => {
-    let seenIds = new Set();
+    let handled = false;
     const poll = async () => {
+      if (handled) return;
       try {
         const msgs = await base44.entities.ChatMessage.filter({ room_id: sigRoom() });
-        for (const m of msgs) {
-          if (m.sender_name !== type) continue;
-          if (seenIds.has(m.id)) continue;
-          seenIds.add(m.id);
+        // Only signals from the other person
+        const found = msgs.find(m => m.sender_name === type && m.sender_email !== user?.email);
+        if (found) {
           let parsed;
-          try { parsed = JSON.parse(m.content); } catch { continue; }
+          try { parsed = JSON.parse(found.content); } catch { return; }
+          handled = true;
           clearInterval(pollRef.current);
           await callback(parsed);
-          break;
         }
       } catch {}
     };
-    pollRef.current = setInterval(poll, 1500);
-    poll(); // immediate first check
+    pollRef.current = setInterval(poll, 1000);
+    poll();
   };
 
   const startWebRTC = async () => {
     try {
-      // Get mic
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       localStreamRef.current = stream;
 
@@ -85,14 +85,13 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
           { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
         ],
       });
       pcRef.current = pc;
 
-      // Add local tracks
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
-      // Remote audio → attach to DOM <audio> element
       pc.ontrack = (e) => {
         if (audioRef.current) {
           audioRef.current.srcObject = e.streams[0];
@@ -106,19 +105,28 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
         if (['failed', 'disconnected'].includes(pc.iceConnectionState)) setStatus('failed');
       };
 
+      // Collect ICE candidates incrementally
+      const iceCandidates = [];
+      pc.onicecandidate = (e) => {
+        if (e.candidate) iceCandidates.push(e.candidate.toJSON());
+      };
+
       if (!isIncoming) {
-        // ── Caller: create offer, wait for ICE gather, send, poll answer ──
+        // ── Caller ──
         const offer = await pc.createOffer({ offerToReceiveAudio: true });
         await pc.setLocalDescription(offer);
 
-        // Wait for ICE gathering to complete (max 3s)
-        await waitForIce(pc);
-
-        await storeSignal('offer', {
-          sdp: pc.localDescription,
-          ice: [],
+        // Wait for ICE to finish (max 4s)
+        await new Promise(resolve => {
+          const t = setTimeout(resolve, 4000);
+          pc.onicegatheringstatechange = () => {
+            if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
+          };
         });
 
+        await storeSignal('offer', { sdp: pc.localDescription, ice: iceCandidates });
+
+        // Poll for answer + remote ICE
         pollSignal('answer', async (data) => {
           if (pc.signalingState !== 'have-local-offer') return;
           await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
@@ -128,7 +136,7 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
         });
 
       } else {
-        // ── Callee: poll offer, answer ──
+        // ── Callee ──
         pollSignal('offer', async (data) => {
           if (pc.signalingState !== 'stable') return;
           await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
@@ -140,12 +148,15 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
           await pc.setLocalDescription(answer);
 
           // Wait for ICE before sending answer
-          await waitForIce(pc);
-
-          await storeSignal('answer', {
-            sdp: pc.localDescription,
-            ice: [],
+          await new Promise(resolve => {
+            const t = setTimeout(resolve, 4000);
+            pc.onicegatheringstatechange = () => {
+              if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
+            };
+            if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
           });
+
+          await storeSignal('answer', { sdp: pc.localDescription, ice: iceCandidates });
         });
       }
 
@@ -154,18 +165,6 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
       setStatus('failed');
     }
   };
-
-  // Wait until ICE gathering is complete or timeout
-  const waitForIce = (pc) => new Promise((resolve) => {
-    if (pc.iceGatheringState === 'complete') { resolve(); return; }
-    const timeout = setTimeout(resolve, 3000);
-    pc.onicegatheringstatechange = () => {
-      if (pc.iceGatheringState === 'complete') {
-        clearTimeout(timeout);
-        resolve();
-      }
-    };
-  });
 
   const cleanup = () => {
     clearInterval(pollRef.current);

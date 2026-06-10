@@ -46,38 +46,38 @@
   }
 
   .dark {
-    --background: 30 40% 97%;
-    --foreground: 260 25% 22%;
-    --card: 0 0% 100%;
-    --card-foreground: 260 25% 22%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 260 25% 22%;
-    --primary: 340 80% 65%;
+    --background: 240 28% 10%;
+    --foreground: 280 20% 93%;
+    --card: 240 25% 14%;
+    --card-foreground: 280 20% 93%;
+    --popover: 240 25% 14%;
+    --popover-foreground: 280 20% 93%;
+    --primary: 340 80% 68%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 280 40% 94%;
-    --secondary-foreground: 260 25% 35%;
-    --muted: 30 30% 93%;
-    --muted-foreground: 260 15% 52%;
-    --accent: 270 60% 72%;
+    --secondary: 240 20% 20%;
+    --secondary-foreground: 280 15% 80%;
+    --muted: 240 20% 18%;
+    --muted-foreground: 260 12% 55%;
+    --accent: 270 55% 70%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 70% 60%;
+    --destructive: 0 65% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 280 30% 88%;
-    --input: 280 30% 88%;
-    --ring: 340 80% 65%;
-    --chart-1: 340 80% 65%;
-    --chart-2: 270 60% 72%;
-    --chart-3: 200 70% 65%;
-    --chart-4: 150 60% 55%;
-    --chart-5: 40 90% 65%;
-    --sidebar-background: 30 40% 95%;
-    --sidebar-foreground: 260 25% 28%;
-    --sidebar-primary: 340 80% 65%;
+    --border: 255 20% 22%;
+    --input: 255 20% 22%;
+    --ring: 340 80% 68%;
+    --chart-1: 340 80% 68%;
+    --chart-2: 270 55% 70%;
+    --chart-3: 200 65% 60%;
+    --chart-4: 150 55% 52%;
+    --chart-5: 40 85% 62%;
+    --sidebar-background: 240 28% 8%;
+    --sidebar-foreground: 280 20% 88%;
+    --sidebar-primary: 340 80% 68%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 280 40% 90%;
-    --sidebar-accent-foreground: 260 25% 35%;
-    --sidebar-border: 280 30% 85%;
-    --sidebar-ring: 340 80% 65%;
+    --sidebar-accent: 240 22% 17%;
+    --sidebar-accent-foreground: 280 15% 80%;
+    --sidebar-border: 255 20% 20%;
+    --sidebar-ring: 340 80% 68%;
   }
 }
 
@@ -131,7 +131,7 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(30 40% 95%);
+  background: hsl(var(--background));
 }
 ::-webkit-scrollbar-thumb {
   background: hsl(340 80% 65% / 0.35);

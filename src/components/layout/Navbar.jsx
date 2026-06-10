@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, Search, Bell, MessageCircle, User, Menu, X, 
-  Sparkles, Home, Users, PenTool, Library, UsersRound, Bookmark, Layers
+  Sparkles, Home, Users, PenTool, Library, UsersRound, Bookmark, Layers, Moon, Sun, UserPlus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,23 @@ import GlobalSearch from '@/components/search/GlobalSearch';
 export default function Navbar({ user, notificationCount = 0 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+    return false;
+  });
   const location = useLocation();
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -64,6 +80,9 @@ export default function Navbar({ user, notificationCount = 0 }) {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
+            <button onClick={() => setDarkMode(d => !d)} className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 border border-border/40" title={darkMode ? 'โหมดสว่าง' : 'โหมดมืด'}>
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
             <button onClick={() => setSearchOpen(true)} className="w-9 h-9 rounded-full bg-muted/60 hover:bg-primary/20 flex items-center justify-center text-muted-foreground hover:text-primary transition-all duration-200 border border-border/40">
               <Search className="w-4 h-4" />
             </button>
@@ -129,6 +148,11 @@ export default function Navbar({ user, notificationCount = 0 }) {
                 <Link to="/bookmarks" onClick={() => setMobileOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl font-semibold text-muted-foreground hover:text-primary hover:bg-primary/8">
                     <Bookmark className="w-4 h-4" /> บุ๊คมาร์ค
+                  </Button>
+                </Link>
+                <Link to="/friends" onClick={() => setMobileOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-3 rounded-xl font-semibold text-muted-foreground hover:text-primary hover:bg-primary/8">
+                    <UserPlus className="w-4 h-4" /> เพื่อน
                   </Button>
                 </Link>
                 <Link to="/series" onClick={() => setMobileOpen(false)}>

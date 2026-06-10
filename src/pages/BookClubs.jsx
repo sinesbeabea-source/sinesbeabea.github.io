@@ -77,7 +77,7 @@ export default function BookClubs() {
                 <Users className="w-4 h-4 text-primary" />
                 <span className="text-xs font-medium text-muted-foreground">คลับนักอ่าน</span>
               </div>
-              <h1 className="text-3xl font-space font-bold">Book Clubs</h1>
+              <h1 className="text-3xl font-space font-bold">คลับนักอ่าน</h1>
               <p className="text-muted-foreground text-sm mt-1">เข้าร่วมคลับ อ่านหนังสือ และพูดคุยกับคนที่ชอบเหมือนกัน</p>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
