@@ -236,6 +236,13 @@ export default function Home() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: topRatedBooks, isLoading: topRatedLoading } = useQuery({
+    queryKey: ['top-rated-books'],
+    queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-rating', 10),
+    initialData: [],
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <div>
       <HeroSection user={user} />
@@ -243,7 +250,7 @@ export default function Home() {
       <StatsBar />
       <BookSection title="กำลังนิยม" icon={TrendingUp} books={trendingBooks} loading={trendingLoading} linkTo="/discover" delay={0.3} />
       <PersonalizedRecommendations />
-      <BookSection title="หนังสือยอดนิยม" icon={Star} books={trendingBooks} loading={trendingLoading} linkTo="/discover" delay={0.35} />
+      <BookSection title="คะแนนสูงสุด" icon={Star} books={topRatedBooks} loading={topRatedLoading} linkTo="/discover" delay={0.35} />
       <WriteBanner />
       <BookSection title="เพิ่มล่าสุด" icon={BookOpen} books={recentBooks} loading={recentLoading} linkTo="/discover" delay={0.5} />
     </div>
