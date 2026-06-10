@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Sparkles, TrendingUp, BookOpen, Users, ArrowRight, PenTool, UsersRound, Library, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BookGrid from '@/components/books/BookGrid';
+import PersonalizedRecommendations from '@/components/books/PersonalizedRecommendations';
 import GlassCard from '@/components/ui/GlassCard';
 
 function HeroSection({ user }) {
@@ -241,6 +242,7 @@ export default function Home() {
       <QuickActions />
       <StatsBar />
       <BookSection title="กำลังนิยม" icon={TrendingUp} books={trendingBooks} loading={trendingLoading} linkTo="/discover" delay={0.3} />
+      <PersonalizedRecommendations />
       <WriteBanner />
       <BookSection title="เพิ่มล่าสุด" icon={BookOpen} books={recentBooks} loading={recentLoading} linkTo="/discover" delay={0.5} />
     </div>
