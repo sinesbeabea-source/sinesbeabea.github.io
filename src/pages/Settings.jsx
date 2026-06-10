@@ -16,6 +16,7 @@ export default function Settings() {
   const { user } = useAuth();
   const [bio, setBio] = useState(user?.bio || '');
   const [username, setUsername] = useState(user?.username || '');
+  const [fullName, setFullName] = useState(user?.full_name || '');
   const [saving, setSaving] = useState(false);
   const [usernameError, setUsernameError] = useState('');
 
@@ -29,7 +30,7 @@ export default function Settings() {
       if (taken) { setUsernameError('username นี้ถูกใช้แล้ว'); return; }
     }
     setSaving(true);
-    await base44.auth.updateMe({ bio, username: username || undefined });
+    await base44.auth.updateMe({ bio, username: username || undefined, full_name: fullName || undefined });
     setSaving(false);
     setUsernameError('');
   };
@@ -59,7 +60,7 @@ export default function Settings() {
                 </div>
                 <div>
                   <Label className="text-sm font-medium mb-2 block">ชื่อ</Label>
-                  <Input value={user?.full_name || ''} disabled className="bg-muted" />
+                  <Input value={fullName} onChange={e => setFullName(e.target.value)} placeholder="ชื่อของคุณ" />
                 </div>
                 <div>
                   <Label className="text-sm font-medium mb-2 block">Username</Label>
