@@ -178,7 +178,7 @@ function BookSection({ title, icon: Icon, books, loading, linkTo, delay = 0 }) {
             </Link>
           )}
         </div>
-        <BookGrid books={books} loading={loading} />
+        <BookGrid books={books} loading={loading} scroll />
       </div>
     </motion.section>
   );
