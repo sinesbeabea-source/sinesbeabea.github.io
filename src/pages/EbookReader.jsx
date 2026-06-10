@@ -12,6 +12,7 @@ import PremiumChapterModal from '@/components/reader/PremiumChapterModal';
 import BookmarkButton from '@/components/reader/BookmarkButton';
 import TTSButton from '@/components/reader/TTSButton';
 import HighlightLayer from '@/components/reader/HighlightLayer';
+import EmotionGraph from '@/components/reader/EmotionGraph';
 
 export default function EbookReader() {
   const { bookId, chapterId } = useParams();
@@ -236,6 +237,11 @@ export default function EbookReader() {
             </Link>
           ) : <div />}
         </div>
+      )}
+
+      {/* Emotion Graph */}
+      {!isLocked && chapter?.content && (
+        <EmotionGraph chapterId={chapterId} content={chapter.content} />
       )}
 
       {/* Premium unlock modal */}
