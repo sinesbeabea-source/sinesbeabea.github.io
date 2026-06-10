@@ -215,7 +215,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     queryKey: ['match-record', matchId, user?.email],
     queryFn: () => base44.entities.ReaderMatch.filter({ user_email: user?.email, matched_email: buddyEmail, status: 'accepted' }),
     enabled: !!user?.email && !!buddyEmail,
-    refetchInterval: 3000,
+    refetchInterval: 8000,
     select: (data) => data?.[0] || null,
   });
 
@@ -224,7 +224,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     queryKey: ['buddy-match-record', buddyEmail, user?.email],
     queryFn: () => base44.entities.ReaderMatch.filter({ user_email: buddyEmail, matched_email: user?.email }),
     enabled: !!buddyEmail && !!user?.email,
-    refetchInterval: 3000,
+    refetchInterval: 8000,
     select: (data) => data?.[0] || null,
   });
 
@@ -253,7 +253,7 @@ export default function MatchChatPopup({ matchId, buddyEmail, bookTitle, onClose
     queryKey: ['popup-messages', chatRoom?.id],
     queryFn: () => base44.entities.ChatMessage.filter({ room_id: chatRoom.id }, 'created_date', 100),
     enabled: !!chatRoom?.id,
-    refetchInterval: 3000,
+    refetchInterval: 8000,
   });
 
   useEffect(() => {
