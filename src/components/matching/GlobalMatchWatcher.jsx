@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import MatchChatPopup from './MatchChatPopup';
 import { MessageCircleHeart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * Polls every 4s for newly accepted matches (popup_opened=false).
@@ -13,10 +14,12 @@ import { MessageCircleHeart } from 'lucide-react';
  */
 export default function GlobalMatchWatcher() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [chatPopup, setChatPopup] = useState(null);
   const [minimized, setMinimized] = useState(false);
   const chatPopupRef = useRef(null);
   const processingRef = useRef(false);
+  const lastSyncRef = useRef(null);
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -57,7 +60,15 @@ export default function GlobalMatchWatcher() {
           return;
         }
 
-        // 3) Restore popup after page refresh
+        // 3) Check for sync_active — buddy wants to read together
+        const syncMatch = allAccepted.find(m => m.sync_active && m.sync_chapter_id);
+        if (syncMatch && lastSyncRef.current !== syncMatch.sync_chapter_id) {
+          lastSyncRef.current = syncMatch.sync_chapter_id;
+          navigate(`/read/${syncMatch.sync_book_id}/${syncMatch.sync_chapter_id}`);
+          return;
+        }
+
+        // 4) Restore popup after page refresh
         const existing = allAccepted.find(m => m.popup_opened);
         if (existing) {
           setChatPopup({ matchId: existing.id, buddyEmail: existing.matched_email, bookTitle: existing.book_title });
