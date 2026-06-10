@@ -75,6 +75,18 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
     poll();
   };
 
+  const waitForIce = (pc) => new Promise(resolve => {
+    if (pc.iceGatheringState === 'complete') { resolve(); return; }
+    const check = () => {
+      if (pc.iceGatheringState === 'complete') {
+        pc.removeEventListener('icegatheringstatechange', check);
+        resolve();
+      }
+    };
+    pc.addEventListener('icegatheringstatechange', check);
+    setTimeout(resolve, 5000); // fallback
+  });
+
   const startWebRTC = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -85,7 +97,9 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
           { urls: 'stun:stun2.l.google.com:19302' },
-          { urls: 'stun:stun3.l.google.com:19302' },
+          // Free TURN server for NAT traversal
+          { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+          { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
         ],
       });
       pcRef.current = pc;
@@ -93,22 +107,16 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
       stream.getTracks().forEach(track => pc.addTrack(track, stream));
 
       pc.ontrack = (e) => {
-        if (audioRef.current) {
+        if (audioRef.current && e.streams[0]) {
           audioRef.current.srcObject = e.streams[0];
-          audioRef.current.play().catch(console.warn);
+          audioRef.current.play().catch(() => {});
         }
         setStatus('active');
       };
 
       pc.oniceconnectionstatechange = () => {
         if (['connected', 'completed'].includes(pc.iceConnectionState)) setStatus('active');
-        if (['failed', 'disconnected'].includes(pc.iceConnectionState)) setStatus('failed');
-      };
-
-      // Collect ICE candidates incrementally
-      const iceCandidates = [];
-      pc.onicecandidate = (e) => {
-        if (e.candidate) iceCandidates.push(e.candidate.toJSON());
+        if (pc.iceConnectionState === 'failed') setStatus('failed');
       };
 
       if (!isIncoming) {
@@ -116,23 +124,16 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
         const offer = await pc.createOffer({ offerToReceiveAudio: true });
         await pc.setLocalDescription(offer);
 
-        // Wait for ICE to finish (max 4s)
-        await new Promise(resolve => {
-          const t = setTimeout(resolve, 4000);
-          pc.onicegatheringstatechange = () => {
-            if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
-          };
-        });
+        // Wait for all ICE candidates to be gathered
+        await waitForIce(pc);
 
-        await storeSignal('offer', { sdp: pc.localDescription, ice: iceCandidates });
+        // Send complete SDP (includes all ICE candidates inline)
+        await storeSignal('offer', { sdp: pc.localDescription.toJSON() });
 
-        // Poll for answer + remote ICE
+        // Poll for answer
         pollSignal('answer', async (data) => {
           if (pc.signalingState !== 'have-local-offer') return;
           await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-          for (const c of (data.ice || [])) {
-            await pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
-          }
         });
 
       } else {
@@ -140,23 +141,14 @@ export default function VoiceCall({ matchId, buddyEmail, callStatus, isIncoming,
         pollSignal('offer', async (data) => {
           if (pc.signalingState !== 'stable') return;
           await pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
-          for (const c of (data.ice || [])) {
-            await pc.addIceCandidate(new RTCIceCandidate(c)).catch(() => {});
-          }
 
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
 
-          // Wait for ICE before sending answer
-          await new Promise(resolve => {
-            const t = setTimeout(resolve, 4000);
-            pc.onicegatheringstatechange = () => {
-              if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
-            };
-            if (pc.iceGatheringState === 'complete') { clearTimeout(t); resolve(); }
-          });
+          // Wait for all ICE candidates before sending answer
+          await waitForIce(pc);
 
-          await storeSignal('answer', { sdp: pc.localDescription, ice: iceCandidates });
+          await storeSignal('answer', { sdp: pc.localDescription.toJSON() });
         });
       }
 

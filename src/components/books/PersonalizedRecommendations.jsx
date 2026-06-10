@@ -29,10 +29,12 @@ export default function PersonalizedRecommendations() {
     // Get books the user has read
     const bookIds = [...new Set(myProgress.map(p => p.book_id))].filter(Boolean);
 
+    // Get all available books first (always needed)
+    const allBooks = await base44.entities.Book.filter({ status: 'published' }, '-rating', 50);
+
     let readBooks = [];
     if (bookIds.length > 0) {
-      readBooks = await base44.entities.Book.filter({ status: 'published' }, '-read_count', 100);
-      readBooks = readBooks.filter(b => bookIds.includes(b.id));
+      readBooks = allBooks.filter(b => bookIds.includes(b.id));
     }
 
     // Collect genres from read books
@@ -45,8 +47,7 @@ export default function PersonalizedRecommendations() {
     const sortedGenres = Object.entries(genreCount).sort((a, b) => b[1] - a[1]).map(e => e[0]);
     setTopGenres(sortedGenres.slice(0, 3));
 
-    // Get all available books (excluding already read)
-    const allBooks = await base44.entities.Book.filter({ status: 'published' }, '-rating', 50);
+    // Exclude already-read books
     const unreadBooks = allBooks.filter(b => !bookIds.includes(b.id));
     const bookCandidates = unreadBooks.map(b => ({
       id: b.id,
