@@ -134,6 +134,7 @@ function StatsBar() {
     queryKey: ['stat-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-created_date', 1),
     initialData: [],
+    staleTime: 5 * 60 * 1000,
   });
   const stats = [
     { label: 'หนังสือในคลัง', value: '500+' },
@@ -224,12 +225,14 @@ export default function Home() {
     queryKey: ['trending-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-read_count', 10),
     initialData: [],
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: recentBooks, isLoading: recentLoading } = useQuery({
     queryKey: ['recent-books'],
     queryFn: () => base44.entities.Book.filter({ status: 'published' }, '-created_date', 10),
     initialData: [],
+    staleTime: 5 * 60 * 1000,
   });
 
   return (
