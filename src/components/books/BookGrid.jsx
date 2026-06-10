@@ -24,7 +24,7 @@ export default function BookGrid({ books, loading, columns = 'default' }) {
   if (!books?.length) {
     return (
       <div className="text-center py-16">
-        <p className="text-muted-foreground">No books found</p>
+        <p className="text-muted-foreground">ไม่พบหนังสือ</p>
       </div>
     );
   }
