@@ -85,7 +85,7 @@ export default function GlobalMatchWatcher() {
     };
 
     check();
-    const interval = setInterval(check, 30000);
+    const interval = setInterval(check, 60000);
     return () => clearInterval(interval);
   }, [user?.email]);
 
