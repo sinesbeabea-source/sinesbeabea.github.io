@@ -49,38 +49,39 @@
   }
 
   .dark {
-    --background: 330 24% 8%;
-    --foreground: 30 20% 94%;
-    --card: 330 22% 12%;
-    --card-foreground: 30 20% 94%;
-    --popover: 330 22% 12%;
-    --popover-foreground: 30 20% 94%;
-    --primary: 328 64% 66%;
-    --primary-foreground: 330 30% 8%;
-    --secondary: 330 18% 20%;
-    --secondary-foreground: 30 15% 84%;
-    --muted: 330 16% 16%;
-    --muted-foreground: 30 10% 62%;
-    --accent: 328 64% 70%;
-    --accent-foreground: 330 30% 10%;
-    --destructive: 0 68% 60%;
+    /* Midnight Library — deep navy canvas, amber gold ink */
+    --background: 222 47% 8%;
+    --foreground: 0 0% 96%;
+    --card: 222 40% 12%;
+    --card-foreground: 0 0% 96%;
+    --popover: 222 40% 12%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 43 96% 56%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 222 30% 16%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 222 30% 16%;
+    --muted-foreground: 220 14% 65%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 222 47% 8%;
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 330 16% 20%;
-    --input: 330 16% 20%;
-    --ring: 328 64% 66%;
-    --chart-1: 328 64% 66%;
-    --chart-2: 200 60% 60%;
-    --chart-3: 40 80% 62%;
+    --border: 222 24% 20%;
+    --input: 222 30% 18%;
+    --ring: 43 96% 56%;
+    --chart-1: 43 96% 56%;
+    --chart-2: 200 70% 60%;
+    --chart-3: 280 60% 65%;
     --chart-4: 150 50% 55%;
-    --chart-5: 270 45% 65%;
-    --sidebar-background: 330 26% 6%;
-    --sidebar-foreground: 30 20% 88%;
-    --sidebar-primary: 328 64% 66%;
-    --sidebar-primary-foreground: 330 30% 8%;
-    --sidebar-accent: 330 18% 16%;
-    --sidebar-accent-foreground: 30 15% 84%;
-    --sidebar-border: 330 16% 18%;
-    --sidebar-ring: 328 64% 66%;
+    --chart-5: 0 70% 62%;
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 0 0% 88%;
+    --sidebar-primary: 43 96% 56%;
+    --sidebar-primary-foreground: 222 47% 8%;
+    --sidebar-accent: 222 30% 16%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 222 24% 18%;
+    --sidebar-ring: 43 96% 56%;
   }
 }
 
@@ -96,7 +97,8 @@
   }
   .dark body {
     background-image:
-      radial-gradient(at 100% 0%, hsl(328 64% 50% / 0.12) 0px, transparent 50%);
+      radial-gradient(at 100% 0%, hsl(43 96% 56% / 0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 30%, hsl(217 91% 60% / 0.08) 0px, transparent 45%);
   }
   h1, h2, h3, h4 {
     @apply font-heading;
@@ -179,11 +181,11 @@
   background: hsl(var(--background) / 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, hsl(340 82% 66% / 0.45), hsl(272 62% 72% / 0.45));
+  background: linear-gradient(180deg, hsl(43 96% 56% / 0.45), hsl(38 92% 50% / 0.45));
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, hsl(340 82% 66% / 0.7), hsl(272 62% 72% / 0.7));
+  background: linear-gradient(180deg, hsl(43 96% 56% / 0.7), hsl(38 92% 50% / 0.7));
 }
 
 /* Playful animations */

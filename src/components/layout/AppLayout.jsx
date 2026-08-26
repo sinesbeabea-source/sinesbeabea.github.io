@@ -7,13 +7,14 @@ import GlobalMatchWatcher from '@/components/matching/GlobalMatchWatcher';
 export default function AppLayout() {
   const { user } = useAuth();
 
-  // Restore dark mode preference on app load
+  // Midnight Library is the default theme; users can toggle to light
   useEffect(() => {
     const saved = localStorage.getItem('theme');
-    if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
+    if (saved === 'light') {
       document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+      if (!saved) localStorage.setItem('theme', 'dark');
     }
   }, []);
 
