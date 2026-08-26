@@ -2,7 +2,7 @@ import React from 'react';
 import BookCard from './BookCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function BookGrid({ books, loading, columns = 'default', scroll = false }) {
+export default function BookGrid({ books, loading, columns = 'default', scroll = false, dark = false }) {
   const gridClass = columns === 'large' 
     ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6'
     : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-5';
@@ -37,7 +37,7 @@ export default function BookGrid({ books, loading, columns = 'default', scroll =
   if (!books?.length) {
     return (
       <div className="text-center py-16">
-        <p className="text-muted-foreground">ไม่พบหนังสือ</p>
+        <p className={dark ? 'text-white/40' : 'text-muted-foreground'}>ไม่พบหนังสือ</p>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function BookGrid({ books, loading, columns = 'default', scroll =
       <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
         {books.map((book, i) => (
           <div key={book.id} className="shrink-0 w-36">
-            <BookCard book={book} index={i} />
+            <BookCard book={book} index={i} dark={dark} />
           </div>
         ))}
       </div>
@@ -57,7 +57,7 @@ export default function BookGrid({ books, loading, columns = 'default', scroll =
   return (
     <div className={gridClass}>
       {books.map((book, i) => (
-        <BookCard key={book.id} book={book} index={i} />
+        <BookCard key={book.id} book={book} index={i} dark={dark} />
       ))}
     </div>
   );
