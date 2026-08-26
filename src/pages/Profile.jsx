@@ -76,7 +76,7 @@ export default function Profile() {
               </button>
             </div>
 
-            <h1 className="text-2xl font-space font-bold mb-1">{user?.full_name || 'นักอ่าน'}</h1>
+            <h1 className="text-2xl font-heading font-bold mb-1">{user?.full_name || 'นักอ่าน'}</h1>
             {user?.username ? (
               <p className="text-sm text-primary font-medium mb-1">@{user.username}</p>
             ) : (
@@ -149,7 +149,7 @@ export default function Profile() {
         {/* My Books */}
         {myBooks.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-space font-bold mb-4">หนังสือของฉัน</h2>
+            <h2 className="text-xl font-heading font-bold mb-4">หนังสือของฉัน</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {myBooks.map(book => (
                 <div key={book.id} className="relative group">

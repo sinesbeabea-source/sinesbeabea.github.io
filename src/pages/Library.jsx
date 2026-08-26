@@ -44,11 +44,13 @@ export default function Library() {
     <div className="min-h-screen px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl font-space font-bold mb-2">
-            <LibraryIcon className="inline w-7 h-7 text-primary mr-2" />
-            ชั้นหนังสือของฉัน
-          </h1>
-          <p className="text-muted-foreground text-sm">{progress.length} เล่มในคอลเลกชันของคุณ</p>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <LibraryIcon className="w-5 h-5 text-primary" />
+            </div>
+            <h1 className="text-3xl font-heading font-bold tracking-tight">ชั้นหนังสือของฉัน</h1>
+          </div>
+          <p className="text-muted-foreground text-sm pl-12">{progress.length} เล่มในคอลเลกชันของคุณ</p>
         </motion.div>
 
         <Tabs defaultValue="reading">

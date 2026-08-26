@@ -74,11 +74,13 @@ export default function Discover() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-3xl font-space font-bold mb-2">
-            <Sparkles className="inline w-7 h-7 text-primary mr-2" />
-            ค้นพบหนังสือ
-          </h1>
-          <p className="text-muted-foreground">ค้นหาด้วย AI และคำแนะนำที่คัดสรรมาให้คุณ</p>
+          <div className="flex items-center gap-2.5 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary" />
+            </div>
+            <h1 className="text-3xl font-heading font-bold tracking-tight">ค้นพบหนังสือ</h1>
+          </div>
+          <p className="text-muted-foreground pl-12">ค้นหาด้วย AI และคำแนะนำที่คัดสรรมาให้คุณ</p>
         </motion.div>
 
         {/* AI Search */}
@@ -90,7 +92,7 @@ export default function Discover() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder='ลองพิมพ์ "แฟนตาซีมืดหม่น ตัวเอกฉลาด" หรือ "โรแมนซ์ซึ้งกินใจ"'
-                className="pl-10 h-12 glass rounded-xl border-primary/20 focus:border-primary"
+                className="pl-10 h-12 rounded-xl border border-foreground/12 bg-card focus:border-primary"
               />
             </div>
             <Button type="submit" disabled={aiLoading} className="h-12 px-6 bg-gradient-to-r from-primary to-accent rounded-xl">

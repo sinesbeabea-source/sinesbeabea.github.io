@@ -61,12 +61,17 @@ export default function Community() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-space font-bold">ชุมชนนักอ่าน</h1>
-            <p className="text-muted-foreground text-sm">พูดคุยเรื่องหนังสือ แชร์คำคม และเขียนรีวิว</p>
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-primary" />
+              </div>
+              <h1 className="text-3xl font-heading font-bold tracking-tight">ชุมชนนักอ่าน</h1>
+            </div>
+            <p className="text-muted-foreground text-sm pl-12">พูดคุยเรื่องหนังสือ แชร์คำคม และเขียนรีวิว</p>
           </div>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 bg-gradient-to-r from-primary to-accent rounded-full">
+              <Button className="gap-2 rounded-full">
                 <Plus className="w-4 h-4" /> โพสต์ใหม่
               </Button>
             </DialogTrigger>
