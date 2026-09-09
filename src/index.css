@@ -12,40 +12,40 @@
     --font-heading: 'Mali', 'Nunito', 'Sarabun', sans-serif;
     --font-display: 'Mali', 'Nunito', 'Sarabun', sans-serif;
 
-    /* Editorial Clean — off-white canvas, mulberry ink, magazine calm */
-    --background: 0 0% 97.6%;
-    --foreground: 330 30% 10%;
+    /* Lilac Clean — off-white canvas, indigo ink, soft purple accents */
+    --background: 240 100% 99%;
+    --foreground: 217 33% 17%;
     --card: 0 0% 100%;
-    --card-foreground: 330 30% 10%;
+    --card-foreground: 217 33% 17%;
     --popover: 0 0% 100%;
-    --popover-foreground: 330 30% 10%;
-    --primary: 328 62% 30%;
+    --popover-foreground: 217 33% 17%;
+    --primary: 239 84% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 330 22% 95%;
-    --secondary-foreground: 328 50% 28%;
-    --muted: 0 0% 94%;
-    --muted-foreground: 330 8% 44%;
-    --accent: 328 62% 42%;
+    --secondary: 240 33% 94%;
+    --secondary-foreground: 239 60% 45%;
+    --muted: 220 20% 95%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 258 90% 66%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 58%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 330 10% 90%;
-    --input: 330 10% 90%;
-    --ring: 328 62% 30%;
-    --chart-1: 328 62% 38%;
-    --chart-2: 200 60% 50%;
-    --chart-3: 40 80% 55%;
-    --chart-4: 150 50% 45%;
-    --chart-5: 270 40% 55%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 239 84% 61%;
+    --chart-1: 239 84% 61%;
+    --chart-2: 258 90% 66%;
+    --chart-3: 330 80% 60%;
+    --chart-4: 160 84% 35%;
+    --chart-5: 38 92% 50%;
     --radius: 1rem;
-    --sidebar-background: 0 0% 96%;
-    --sidebar-foreground: 330 30% 14%;
-    --sidebar-primary: 328 62% 30%;
+    --sidebar-background: 240 50% 97%;
+    --sidebar-foreground: 217 33% 17%;
+    --sidebar-primary: 239 84% 61%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 330 22% 94%;
-    --sidebar-accent-foreground: 328 50% 28%;
-    --sidebar-border: 330 10% 88%;
-    --sidebar-ring: 328 62% 30%;
+    --sidebar-accent: 240 33% 93%;
+    --sidebar-accent-foreground: 239 60% 45%;
+    --sidebar-border: 214 32% 89%;
+    --sidebar-ring: 239 84% 61%;
   }
 
   .dark {
@@ -92,7 +92,7 @@
   body {
     @apply bg-background text-foreground font-body;
     background-image:
-      radial-gradient(at 100% 0%, hsl(328 62% 60% / 0.05) 0px, transparent 50%);
+      radial-gradient(at 100% 0%, hsl(239 84% 67% / 0.06) 0px, transparent 50%);
     background-attachment: fixed;
   }
   .dark body {

@@ -7,14 +7,14 @@ import GlobalMatchWatcher from '@/components/matching/GlobalMatchWatcher';
 export default function AppLayout() {
   const { user } = useAuth();
 
-  // Midnight Library is the default theme; users can toggle to light
+  // Lilac Clean is the default theme; users can toggle to Midnight Library dark
   useEffect(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
+    const saved = localStorage.getItem('theme-v2');
+    if (saved === 'dark') {
       document.documentElement.classList.add('dark');
-      if (!saved) localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      if (!saved) localStorage.setItem('theme-v2', 'light');
     }
   }, []);
 

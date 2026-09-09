@@ -14,19 +14,19 @@ export default function Navbar({ user, notificationCount = 0 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'light' ? false : true;
+      return localStorage.getItem('theme-v2') === 'dark' ? true : false;
     }
-    return true;
+    return false;
   });
   const location = useLocation();
 
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      localStorage.setItem('theme-v2', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      localStorage.setItem('theme-v2', 'light');
     }
   }, [darkMode]);
 
