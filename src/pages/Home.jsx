@@ -8,7 +8,7 @@ import CategoriesRow from '@/components/home/CategoriesRow';
 import HomeSidebar from '@/components/home/HomeSidebar';
 import CommunityFeed from '@/components/home/CommunityFeed';
 import BottomBanner from '@/components/home/BottomBanner';
-import BookGrid from '@/components/books/BookGrid';
+import Book3DRow from '@/components/books/Book3DRow';
 
 export default function Home() {
   const { user } = useAuth();
@@ -74,7 +74,7 @@ export default function Home() {
                 <Sparkles className="w-5 h-5 text-primary" />
                 <h2 className="text-lg font-heading font-bold">แนะนำสำหรับคุณ</h2>
               </div>
-              <BookGrid books={trendingBooks} loading={trendingLoading} scroll />
+              <Book3DRow books={trendingBooks} loading={trendingLoading} />
             </section>
             <CommunityFeed posts={posts} />
           </div>
