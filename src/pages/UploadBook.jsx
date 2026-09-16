@@ -11,6 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import GlassCard from '@/components/ui/GlassCard';
 
 const GENRES = ['Fantasy', 'Romance', 'Mystery', 'Sci-Fi', 'Horror', 'Thriller', 'Adventure', 'Drama', 'Comedy', 'Action'];
+const GENRE_LABELS = {
+  Fantasy: 'แฟนตาซี', Romance: 'โรแมนติก', Mystery: 'สืบสวน', 'Sci-Fi': 'ไซไฟ', Horror: 'สยองขวัญ',
+  Thriller: 'ระทึกขวัญ', Adventure: 'ผจญภัย', Drama: 'ชีวิต', Comedy: 'ตลก', Action: 'แอ็กชัน',
+};
+const MOOD_LABELS = {
+  dark: 'มืดหม่น', emotional: 'เร้าอารมณ์', relaxing: 'ผ่อนคลาย', horror: 'สยองขวัญ', action: 'แอ็กชัน',
+  psychological: 'จิตวิทยา', romantic: 'โรแมนติก', mystery: 'ลึกลับ', adventure: 'ผจญภัย', comedy: 'ตลก',
+};
 
 export default function UploadBook() {
   const navigate = useNavigate();
@@ -25,9 +33,18 @@ export default function UploadBook() {
   const [saving, setSaving] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [tags, setTags] = useState([]);
+  const [customGenre, setCustomGenre] = useState('');
 
   const toggleGenre = (g) => {
     setSelectedGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
+  };
+
+  const addCustomGenre = () => {
+    const g = customGenre.trim();
+    if (g && !selectedGenres.includes(g)) {
+      setSelectedGenres(prev => [...prev, g]);
+    }
+    setCustomGenre('');
   };
 
   const handleCover = (e) => {
@@ -85,9 +102,9 @@ export default function UploadBook() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-3xl font-space font-bold mb-2">
             <Upload className="inline w-7 h-7 text-primary mr-2" />
-            Upload Book
+            อัปโหลดหนังสือ
           </h1>
-          <p className="text-muted-foreground text-sm mb-8">Share your book with the community</p>
+          <p className="text-muted-foreground text-sm mb-8">แชร์หนังสือของคุณกับชุมชนนักอ่าน</p>
 
           <div className="space-y-6">
             {/* Cover */}
@@ -102,8 +119,8 @@ export default function UploadBook() {
                     )}
                   </div>
                   <div>
-                    <p className="font-medium mb-1">Upload Cover Image</p>
-                    <p className="text-sm text-muted-foreground">Recommended: 600x900px</p>
+                    <p className="font-medium mb-1">อัปโหลดรูปปกหนังสือ</p>
+                    <p className="text-sm text-muted-foreground">ขนาดแนะนำ: 600x900px</p>
                   </div>
                 </div>
                 <input type="file" accept="image/*" className="hidden" onChange={handleCover} />
@@ -112,20 +129,20 @@ export default function UploadBook() {
 
             {/* Details */}
             <div className="space-y-4">
-              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Book Title *" className="h-12" />
-              <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="Author Name" className="h-12" />
-              <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Description / Synopsis" rows={4} />
+              <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="ชื่อเรื่อง *" className="h-12" />
+              <Input value={author} onChange={e => setAuthor(e.target.value)} placeholder="ชื่อผู้แต่ง" className="h-12" />
+              <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="คำโปรย / เรื่องย่อ" rows={4} />
             </div>
 
             {/* AI Assist */}
             <Button variant="outline" onClick={aiAssist} disabled={aiLoading} className="gap-2 rounded-full border-primary/30">
               {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-primary" />}
-              AI Auto-Fill
+              ให้ AI ช่วยกรอก
             </Button>
 
             {/* Genres */}
             <div>
-              <label className="text-sm font-medium mb-2 block">Genres</label>
+              <label className="text-sm font-medium mb-2 block">หมวดหมู่</label>
               <div className="flex flex-wrap gap-2">
                 {GENRES.map(g => (
                   <Badge
@@ -133,16 +150,35 @@ export default function UploadBook() {
                     onClick={() => toggleGenre(g)}
                     className={`cursor-pointer ${selectedGenres.includes(g) ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-primary/20'}`}
                   >
-                    {g}
+                    {GENRE_LABELS[g] || g}
                   </Badge>
                 ))}
+                {selectedGenres.filter(g => !GENRES.includes(g)).map(g => (
+                  <Badge
+                    key={g}
+                    onClick={() => toggleGenre(g)}
+                    className="cursor-pointer bg-accent text-accent-foreground"
+                  >
+                    {g} ✕
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2 mt-3">
+                <Input
+                  value={customGenre}
+                  onChange={e => setCustomGenre(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustomGenre())}
+                  placeholder="ใส่หมวดหมู่เอง เช่น กีฬา อาหาร ประวัติศาสตร์"
+                  className="h-10"
+                />
+                <Button type="button" variant="outline" onClick={addCustomGenre} className="shrink-0">เพิ่ม</Button>
               </div>
             </div>
 
             {/* Tags */}
             {tags.length > 0 && (
               <div>
-                <label className="text-sm font-medium mb-2 block">AI Tags</label>
+                <label className="text-sm font-medium mb-2 block">แท็กจาก AI</label>
                 <div className="flex flex-wrap gap-1.5">
                   {tags.map(t => <Badge key={t} variant="outline" className="text-xs border-accent/30 text-accent">{t}</Badge>)}
                 </div>
@@ -152,24 +188,24 @@ export default function UploadBook() {
             {/* Mood & Rating */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Mood</label>
+                <label className="text-sm font-medium mb-2 block">อารมณ์เรื่อง</label>
                 <Select value={mood} onValueChange={setMood}>
-                  <SelectTrigger><SelectValue placeholder="Select mood" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="เลือกอารมณ์เรื่อง" /></SelectTrigger>
                   <SelectContent>
                     {['dark', 'emotional', 'relaxing', 'horror', 'action', 'psychological', 'romantic', 'mystery'].map(m => (
-                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                      <SelectItem key={m} value={m}>{MOOD_LABELS[m] || m}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium mb-2 block">Content Rating</label>
+                <label className="text-sm font-medium mb-2 block">เรตติ้งเนื้อหา</label>
                 <Select value={contentRating} onValueChange={setContentRating}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">General</SelectItem>
-                    <SelectItem value="teen">Teen (15+)</SelectItem>
-                    <SelectItem value="mature">Mature (18+)</SelectItem>
+                    <SelectItem value="general">ทั่วไป</SelectItem>
+                    <SelectItem value="teen">วัยรุ่น (15+)</SelectItem>
+                    <SelectItem value="mature">ผู้ใหญ่ (18+)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -177,7 +213,7 @@ export default function UploadBook() {
 
             <Button onClick={handleSubmit} disabled={saving || !title.trim()} className="w-full h-12 bg-gradient-to-r from-primary to-accent rounded-xl text-lg gap-2">
               {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <BookOpen className="w-5 h-5" />}
-              Publish Book
+              เผยแพร่หนังสือ
             </Button>
           </div>
         </motion.div>
